@@ -439,7 +439,6 @@
                         tmpcol.push(tmprow);
                     }
                     map = tmpcol;
-                    console.log(map);
                     for (let j = 0; j < height; j++) {
                         for (let i = 0; i < width; i++) {
                             if (map[j][i] != null) {

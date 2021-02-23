@@ -1,0 +1,4 @@
+{
+  "code": "export var NodeType;\r\n(function (NodeType) {\r\n    NodeType[NodeType[\"A\"] = 0] = \"A\";\r\n    NodeType[NodeType[\"B\"] = 1] = \"B\";\r\n    NodeType[NodeType[\"C\"] = 2] = \"C\";\r\n    NodeType[NodeType[\"D\"] = 3] = \"D\";\r\n})(NodeType || (NodeType = {}));\r\nexport default class Node {\r\n    constructor(_index, _type, _pointto) {\r\n        this.index = _index;\r\n        this.type = _type;\r\n        this.pointTo = _pointto;\r\n    }\r\n}\r\n",
+  "references": []
+}

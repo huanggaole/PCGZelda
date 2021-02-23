@@ -1,0 +1,7 @@
+{
+  "code": "import Graphic from \"./Graphic\";\r\nimport Node, { NodeType } from \"./Node\";\r\nexport default class Rules {\r\n    constructor() {\r\n        this.rule1pre = new Graphic();\r\n        this.rule1res = new Graphic();\r\n        this.rule2pre = new Graphic();\r\n        this.rule2res = new Graphic();\r\n        this.rule3pre = new Graphic();\r\n        this.rule3res = new Graphic();\r\n        this.generateRule1();\r\n    }\r\n    generateRule1() {\r\n        let A = new Node(0, NodeType.A, [1, 2]);\r\n        let B = new Node(1, NodeType.B, [2]);\r\n        let C = new Node(2, NodeType.C, []);\r\n        this.rule1pre.nodes = [];\r\n        this.rule1pre.nodes.push(A);\r\n        this.rule1pre.nodes.push(B);\r\n        this.rule1pre.nodes.push(C);\r\n        this.rule1pre.startNode = A;\r\n        let newA1 = new Node(0, NodeType.A, [1, 2]);\r\n        let newA2 = new Node(1, NodeType.A, [2]);\r\n        let newB = new Node(2, NodeType.B, []);\r\n        this.rule1res.nodes = [];\r\n        this.rule1res.nodes.push(newA1);\r\n        this.rule1res.nodes.push(newA2);\r\n        this.rule1res.nodes.push(B);\r\n        this.rule1res.startNode = newA1;\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/FanErSai/src/graphic/Graphic.ts",
+    "/Users/huanggaole/FanErSai/src/graphic/Node.ts"
+  ]
+}

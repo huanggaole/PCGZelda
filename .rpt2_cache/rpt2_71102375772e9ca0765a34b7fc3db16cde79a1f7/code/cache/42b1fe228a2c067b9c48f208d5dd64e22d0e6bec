@@ -1,0 +1,6 @@
+{
+  "code": "import Node, { NodeType } from \"./Node\";\r\nexport default class Graphic {\r\n    constructor() {\r\n        this.nodes = [];\r\n    }\r\n    test1() {\r\n        let A = new Node(1, NodeType.A, [2]);\r\n        let B = new Node(2, NodeType.B, [3]);\r\n        let C = new Node(3, NodeType.C, [4]);\r\n        let D = new Node(4, NodeType.D, [1]);\r\n        this.nodes = [];\r\n        this.nodes.push(A);\r\n        this.nodes.push(B);\r\n        this.nodes.push(C);\r\n        this.nodes.push(D);\r\n        this.startNode = A;\r\n    }\r\n    printGraphic() {\r\n        for (let i = 0; i < this.nodes.length; i++) {\r\n            console.log(this.nodes[i].index + \"->\");\r\n            for (let j = 0; j < this.nodes[i].pointTo.length; j++) {\r\n                console.log(this.nodes[i].pointTo[j] + \" \");\r\n            }\r\n        }\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/FanErSai/src/graphic/Node.ts"
+  ]
+}

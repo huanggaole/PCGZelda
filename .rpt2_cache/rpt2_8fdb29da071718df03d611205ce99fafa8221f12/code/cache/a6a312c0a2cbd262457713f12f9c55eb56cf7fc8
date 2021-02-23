@@ -1,0 +1,6 @@
+{
+  "code": "export var Direction;\r\n(function (Direction) {\r\n    Direction[Direction[\"None\"] = 0] = \"None\";\r\n    Direction[Direction[\"UP\"] = 1] = \"UP\";\r\n    Direction[Direction[\"Down\"] = 2] = \"Down\";\r\n    Direction[Direction[\"Left\"] = 3] = \"Left\";\r\n    Direction[Direction[\"Right\"] = 4] = \"Right\";\r\n})(Direction || (Direction = {}));\r\nexport default class Region {\r\n    constructor(_index) {\r\n        this.index = _index;\r\n        this.upConnect = false;\r\n        this.downConnect = false;\r\n        this.leftConnect = false;\r\n        this.rightConnect = false;\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/FanErSai/src/script/Node.ts"
+  ]
+}
