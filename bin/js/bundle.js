@@ -20,6 +20,9 @@
             this.pointTo = _pointto;
             this.candidates = [];
             this.keyTo = _keyto;
+            let x = -1;
+            let y = -1;
+            this.PlaceinGrid = { x, y };
         }
         ifcandidate(node) {
             if (node.type == this.type) {
@@ -296,6 +299,14 @@
         Direction[Direction["Left"] = 3] = "Left";
         Direction[Direction["Right"] = 4] = "Right";
     })(Direction || (Direction = {}));
+    var RegionType;
+    (function (RegionType) {
+        RegionType[RegionType["Undefined"] = 0] = "Undefined";
+        RegionType[RegionType["Grass"] = 1] = "Grass";
+        RegionType[RegionType["Desert"] = 2] = "Desert";
+        RegionType[RegionType["Snow"] = 3] = "Snow";
+        RegionType[RegionType["Lava"] = 4] = "Lava";
+    })(RegionType || (RegionType = {}));
     class Region {
         constructor(_index) {
             this.index = _index;
@@ -303,6 +314,7 @@
             this.downConnect = false;
             this.leftConnect = false;
             this.rightConnect = false;
+            this.regiontype = RegionType.Undefined;
         }
     }
 
@@ -314,7 +326,7 @@
             let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.startpre);
             let match = MatchRes[0];
             GraphOperations.changeOriG(oriG, Rules.startpre, Rules.startnew, match);
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 12; i++) {
                 let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.addpre);
                 let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
                 if (Math.random() < 0.5) {
@@ -344,7 +356,7 @@
                     GraphOperations.changeOriG(oriG, Rules.addpre, Rules.defineT2new, match);
                 }
             }
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 10; i++) {
                 let MatchRes = GraphOperations.FindLs(oriG);
                 if (MatchRes.length == 0) {
                     break;
@@ -395,11 +407,16 @@
                 res = res && this.setGrid(oriG, index, map, size, newGridindex, unoccupied, rect);
             }
             else {
+                let forchild = [];
                 for (let i = 0; i < oriG.nodes[index].pointTo.length; i++) {
                     let randomUindex = Math.floor(Math.random() * unoccupied.length);
                     let newGridindex = unoccupied[randomUindex];
+                    forchild.push(newGridindex);
                     unoccupied = unoccupied.filter(item => item != newGridindex);
-                    res = res && this.setGrid(oriG, oriG.nodes[index].pointTo[i], map, size, newGridindex, [], rect);
+                    map[newGridindex] = oriG.nodes[index].pointTo[i];
+                }
+                for (let i = 0; i < oriG.nodes[index].pointTo.length; i++) {
+                    res = res && this.setGrid(oriG, oriG.nodes[index].pointTo[i], map, size, forchild[i], [], rect);
                 }
             }
             return res;
@@ -412,6 +429,7 @@
                     map.push(-1);
                 }
             }
+            let count = 0;
             while (true) {
                 let initindex = Math.floor(size / 2) * size + Math.floor(size / 2);
                 let minx = initindex % size;
@@ -420,6 +438,7 @@
                 let maxy = (initindex - maxx) / size;
                 let rect = { minx, maxx, miny, maxy };
                 let res = this.setGrid(oriG, 0, map, size, initindex, [], rect);
+                count++;
                 if (res) {
                     let width = rect.maxx - rect.minx + 1;
                     let height = rect.maxy - rect.miny + 1;
@@ -446,11 +465,20 @@
                                 let index = curmap.index;
                                 curmap.node = oriG.nodes[index];
                                 let pointto = oriG.nodes[index].pointTo;
+                                if (curmap.node.PlaceinGrid.x == -1 && curmap.node.PlaceinGrid.y == -1) {
+                                    curmap.node.PlaceinGrid.x = i;
+                                    curmap.node.PlaceinGrid.y = j;
+                                }
+                                else {
+                                    curmap.node = new Node(curmap.node.index, NodeType.T, curmap.node.keyTo);
+                                    curmap.node.PlaceinGrid.x = i;
+                                    curmap.node.PlaceinGrid.y = j;
+                                }
                                 if (j > 0) {
                                     let tmpmap = map[(j - 1)][i];
                                     if (tmpmap != null) {
                                         let tmpindex = tmpmap.index;
-                                        if (pointto.indexOf(tmpindex) > -1) {
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
                                             curmap.upConnect = true;
                                             tmpmap.downConnect = true;
                                         }
@@ -460,7 +488,7 @@
                                     let tmpmap = map[(j + 1)][i];
                                     if (tmpmap != null) {
                                         let tmpindex = tmpmap.index;
-                                        if (pointto.indexOf(tmpindex) > -1) {
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
                                             curmap.downConnect = true;
                                             tmpmap.upConnect = true;
                                         }
@@ -470,7 +498,7 @@
                                     let tmpmap = map[j][i - 1];
                                     if (tmpmap != null) {
                                         let tmpindex = tmpmap.index;
-                                        if (pointto.indexOf(tmpindex) > -1) {
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
                                             curmap.leftConnect = true;
                                             tmpmap.rightConnect = true;
                                         }
@@ -480,7 +508,7 @@
                                     let tmpmap = map[j][i + 1];
                                     if (tmpmap != null) {
                                         let tmpindex = tmpmap.index;
-                                        if (pointto.indexOf(tmpindex) > -1) {
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
                                             curmap.rightConnect = true;
                                             tmpmap.leftConnect = true;
                                         }
@@ -489,10 +517,81 @@
                             }
                         }
                     }
+                    this.setRegionType(map, oriG.nodes[0].PlaceinGrid.x, oriG.nodes[0].PlaceinGrid.y, RegionType.Grass);
+                    break;
+                }
+                if (count > 100) {
+                    console.log("映射失败！");
                     break;
                 }
             }
             return map;
+        }
+        static setRegionType(map, x, y, type) {
+            let region = map[y][x];
+            if (region.regiontype != RegionType.Undefined) {
+                return;
+            }
+            if (region.node.type == NodeType.b || region.node.type == NodeType.g) {
+                type = RegionType.Lava;
+            }
+            region.regiontype = type;
+            if (region.upConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                this.setRegionType(map, x, y - 1, newtype);
+            }
+            if (region.downConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                this.setRegionType(map, x, y + 1, newtype);
+            }
+            if (region.leftConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                this.setRegionType(map, x - 1, y, newtype);
+            }
+            if (region.rightConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                this.setRegionType(map, x + 1, y, newtype);
+            }
         }
     }
 
@@ -515,6 +614,88 @@
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
+
+    class Smallthis extends Laya.Image {
+        constructor(map) {
+            super();
+            let width = map[0].length;
+            let height = map.length;
+            let gridwidth = 60;
+            let gridheight = 30;
+            let marginwidth = 10;
+            let marginheight = 5;
+            this.width = gridwidth * width;
+            this.height = 20 * height;
+            for (let j = 0; j < height; j++) {
+                for (let i = 0; i < width; i++) {
+                    if (map[j][i] == null) {
+                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, "#0000ff", "#0000ff");
+                    }
+                    else {
+                        let tmpmap = map[j][i];
+                        let groundcolor = "#00ff00";
+                        let barriercolor = "#00cc00";
+                        if (tmpmap.regiontype == RegionType.Snow) {
+                            groundcolor = "#ffffff";
+                            barriercolor = "#cccccc";
+                        }
+                        else if (tmpmap.regiontype == RegionType.Desert) {
+                            groundcolor = "#ffff00";
+                            barriercolor = "#cccc00";
+                        }
+                        else if (tmpmap.regiontype == RegionType.Lava) {
+                            groundcolor = "#9f8f8f";
+                            barriercolor = "#0c0c0c";
+                        }
+                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, groundcolor, groundcolor);
+                        if (tmpmap.upConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.downConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), gridwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.leftConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.rightConnect) {
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.node.type == NodeType.e) {
+                            this.graphics.fillText("🦸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.b) {
+                            this.graphics.fillText("👹", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.g) {
+                            this.graphics.fillText("👸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.k) {
+                            this.graphics.fillText("🔑" + tmpmap.node.keyTo[0], i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.l) {
+                            this.graphics.fillText("🔒" + tmpmap.node.index, i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     class Main {
         constructor() {
@@ -542,7 +723,14 @@
         }
         onConfigLoaded() {
             let map = Map.generateWorld();
+            while (map.length == 0) {
+                map = Map.generateWorld();
+            }
             console.log(map);
+            let MapScene = new Laya.Scene();
+            Laya.stage.addChild(MapScene);
+            let MapImage = new Smallthis(map);
+            MapScene.addChild(MapImage);
         }
     }
     new Main();

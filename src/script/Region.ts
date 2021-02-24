@@ -1,11 +1,19 @@
 import Node from "./Node"
-    export enum Direction{
+export enum Direction{
     None,
     UP,
     Down,
     Left,
     Right
 }
+export enum RegionType{
+    Undefined,
+    Grass,
+    Desert,
+    Snow,
+    Lava
+}
+
 export default class Region{
     public index;
     public upConnect:boolean;
@@ -13,6 +21,7 @@ export default class Region{
     public leftConnect:boolean;
     public rightConnect:boolean;
     public node:Node;
+    public regiontype:RegionType;
 
     constructor(_index:number){
         this.index = _index;
@@ -20,5 +29,6 @@ export default class Region{
         this.downConnect = false;
         this.leftConnect = false;
         this.rightConnect = false;
+        this.regiontype = RegionType.Undefined;
     }
 }

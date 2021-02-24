@@ -20,12 +20,17 @@ export default class Node{
 
     candidates:number[];
 
+    PlaceinGrid:{x:number,y:number};
+
     constructor(_index:number, _type:NodeType, _pointto:number[], _keyto = []){
         this.index = _index;
         this.type = _type;
         this.pointTo = _pointto;
         this.candidates = [];
         this.keyTo = _keyto;
+        let x = -1;
+        let y = -1;
+        this.PlaceinGrid = {x,y};
     }
 
     ifcandidate(node:Node){   

@@ -1,5 +1,8 @@
 import Map from "./script/Map";
 import GameConfig from "./myGameConfig"
+import Region, { RegionType } from "./script/Region";
+import { NodeType } from "./script/Node";
+import SmallMapImage from "./graphic/SmallMapImage";
 class Main {
 	constructor() {
 		//根据IDE设置初始化引擎		
@@ -31,7 +34,16 @@ class Main {
 	onConfigLoaded(): void {
 		//加载IDE指定的场景
 		let map = Map.generateWorld();
+		while(map.length == 0){
+			map = Map.generateWorld();
+		}
 		console.log(map);
+
+		let MapScene = new Laya.Scene();
+		Laya.stage.addChild(MapScene);
+		let MapImage = new SmallMapImage(map);
+		MapScene.addChild(MapImage);
+
 	}
 }
 //激活启动类
