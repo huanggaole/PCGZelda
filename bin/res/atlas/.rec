@@ -1,4 +1,7 @@
 D .
+D Battle
+R F9A38A5D GrassLand.png
+R 9401C138 map1.png
 D comp
 P 9401CC40 blank.png
 P 316AD948 btn_close.png

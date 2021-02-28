@@ -3,6 +3,7 @@ import GameConfig from "./myGameConfig"
 import Region, { RegionType } from "./script/Region";
 import { NodeType } from "./script/Node";
 import SmallMapImage from "./graphic/SmallMapImage";
+import BattleScene from "./scene/BattleScene";
 class Main {
 	constructor() {
 		//根据IDE设置初始化引擎		
@@ -30,9 +31,10 @@ class Main {
 		//激活大小图映射，加载小图的时候，如果发现小图在大图合集里面，则优先加载大图合集，而不是小图
 		Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));
 	}
-
+	tMap:Laya.TiledMap;
 	onConfigLoaded(): void {
 		//加载IDE指定的场景
+		/*
 		let map = Map.generateWorld();
 		while(map.length == 0){
 			map = Map.generateWorld();
@@ -41,9 +43,20 @@ class Main {
 
 		let MapScene = new Laya.Scene();
 		Laya.stage.addChild(MapScene);
-		let MapImage = new SmallMapImage(map);
-		MapScene.addChild(MapImage);
+		// let MapImage = new SmallMapImage(map);
+		// MapScene.addChild(MapImage);
+		*/
+		//创建TiledMap实例
+		let bs = new BattleScene();
+		Laya.stage.addChild(bs);
+	}
 
+	private onMapLoaded(): void {
+		//设置缩放中心点为视口的左上角
+		this.tMap.setViewPortPivotByScale(0, 0);
+		//将原地图放大2倍
+		this.tMap.scale = 2;
+		console.log(this.tMap);
 	}
 }
 //激活启动类
