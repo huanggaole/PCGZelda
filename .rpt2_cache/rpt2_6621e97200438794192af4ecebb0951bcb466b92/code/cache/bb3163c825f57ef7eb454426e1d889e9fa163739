@@ -1,0 +1,4 @@
+{
+  "code": "export default class Player extends Laya.Script {\r\n    setDirection(_x, _y) {\r\n        this.x = _x;\r\n        this.y = _y;\r\n    }\r\n    onStart() {\r\n        this.x = 0;\r\n        this.y = 0;\r\n        this.speed = 3.0;\r\n        this.rigidbody = this.owner.getComponent(Laya.RigidBody);\r\n    }\r\n    onUpdate() {\r\n        this.rigidbody.setVelocity({ x: this.x * this.speed, y: this.y * this.speed });\r\n    }\r\n}\r\n",
+  "references": []
+}

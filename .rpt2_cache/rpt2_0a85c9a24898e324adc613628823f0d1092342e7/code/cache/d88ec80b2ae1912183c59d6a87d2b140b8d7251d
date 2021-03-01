@@ -1,0 +1,7 @@
+{
+  "code": "import { Joystick } from \"@byted-dino/joystick\";\r\nimport { JoystickLayaLayer } from \"@byted-dino/joystick-laya-layer\";\r\nexport default class BattleScene extends Laya.Scene {\r\n    createChildren() {\r\n        super.createChildren();\r\n        this.loadScene(\"BattleScene\");\r\n        this.joystickBackground = \"laya/assets/circle.png\";\r\n        this.joystickCircle = \"laya/assets/circle_out.png\";\r\n        const jsLayaLayer = new JoystickLayaLayer({\r\n            root: this,\r\n            size: 180,\r\n            position: {\r\n                x: 100,\r\n                y: 100,\r\n            },\r\n            isFixed: false,\r\n            skin: this.joystickBackground,\r\n            circle: this.joystickCircle,\r\n        });\r\n        const joystick = new Joystick(jsLayaLayer);\r\n        joystick.open();\r\n        joystick.listen(\"joystickMove\", (data) => {\r\n            console.log(data);\r\n        });\r\n    }\r\n    onAwake() {\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/node_modules/@byted-dino/joystick/dist/joystick.d.ts",
+    "/Users/huanggaole/PCGZelda/node_modules/@byted-dino/joystick-laya-layer/dist/joystick_laya-layer.d.ts"
+  ]
+}

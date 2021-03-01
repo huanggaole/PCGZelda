@@ -1,0 +1,9 @@
+{
+  "code": "import BattleScene from \"./scene/BattleScene\";\r\nimport Character from \"./character/Character\";\r\nimport Player from \"./character/Player\";\r\nimport GrassEnemy1 from \"./character/GrassEnemy1\";\r\nexport default class GameConfig {\r\n    constructor() { }\r\n    static init() {\r\n        var reg = Laya.ClassUtils.regClass;\r\n        reg(\"scene/BattleScene.ts\", BattleScene);\r\n        reg(\"character/Character.ts\", Character);\r\n        reg(\"character/Player.ts\", Player);\r\n        reg(\"character/GrassEnemy1.ts\", GrassEnemy1);\r\n    }\r\n}\r\nGameConfig.width = 960;\r\nGameConfig.height = 640;\r\nGameConfig.scaleMode = \"showall\";\r\nGameConfig.screenMode = \"none\";\r\nGameConfig.alignV = \"top\";\r\nGameConfig.alignH = \"left\";\r\nGameConfig.startScene = \"test/TestScene.scene\";\r\nGameConfig.sceneRoot = \"\";\r\nGameConfig.debug = false;\r\nGameConfig.stat = false;\r\nGameConfig.physicsDebug = true;\r\nGameConfig.exportSceneToJson = true;\r\nGameConfig.init();\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/BattleScene.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Character.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts",
+    "/Users/huanggaole/PCGZelda/src/character/GrassEnemy1.ts"
+  ]
+}

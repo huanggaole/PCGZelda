@@ -1,0 +1,7 @@
+{
+  "code": "import { GameControl } from \"./GameControl\";\r\nimport Player from \"../character/Player\";\r\nexport default class BattleScene extends Laya.Scene {\r\n    createChildren() {\r\n        super.createChildren();\r\n        this.loadScene(\"BattleScene\");\r\n    }\r\n    onAwake() {\r\n        let tmptile = new Laya.FontClip(this.initTile.skin, this.initTile.sheet);\r\n        tmptile.value = this.initTile.value;\r\n        tmptile.x = 96;\r\n        tmptile.y = 0;\r\n        this.battlesprite.addChild(tmptile);\r\n        let playercontroller = this.player.getComponent(Player);\r\n        this.controller = new GameControl(playercontroller);\r\n        console.log(this.player);\r\n        this.addChild(this.controller);\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/GameControl.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts"
+  ]
+}

@@ -44,6 +44,10 @@ P 0587871F vscroll$up.png
 P 5FD17798 vscroll.png
 P DDDDFB9E vslider$bar.png
 P 01BAE7F5 vslider.png
+D Enemy
+P E5C847CB 3.png
+D Player
+P D1F7EF71 15.png
 D sound
 R 1DC3ABD8 destroy.wav
 R FF0B6E8D hit.wav
