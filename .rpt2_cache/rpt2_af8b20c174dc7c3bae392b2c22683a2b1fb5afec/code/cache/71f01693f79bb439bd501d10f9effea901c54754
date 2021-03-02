@@ -1,6 +1,0 @@
-{
-  "code": "import Character from \"./Character\";\r\nexport default class Player extends Character {\r\n    onUpdate() {\r\n        this.doMove();\r\n    }\r\n}\r\n",
-  "references": [
-    "/Users/huanggaole/PCGZelda/src/character/Character.ts"
-  ]
-}

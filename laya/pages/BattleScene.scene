@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":12,
+    "selecteID":21,
     "searchKey":"Scene",
     "props":{"width":960,"sceneColor":"#000000","height":640},
     "nodeParent":-1,
-    "maxID":17,
+    "maxID":22,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -135,69 +135,6 @@
                             "child":[
                                 ]
                         }]
-                }]
-        },
-        {
-            "x":15,
-            "type":"FontClip",
-            "searchKey":"FontClip",
-            "props":{"y":320,"x":193,"value":"匕","skin":"Enemy/3.png","sheet":"一八匕厂 刀儿二几 力人入十 又川寸大","scaleY":3,"scaleX":3},
-            "nodeParent":2,
-            "label":"FontClip",
-            "isOpen":true,
-            "isDirectory":true,
-            "isAniNode":true,
-            "hasChild":true,
-            "compId":12,
-            "child":[
-                {
-                    "x":30,
-                    "type":"BoxCollider",
-                    "switchAble":true,
-                    "searchKey":"BoxCollider",
-                    "removeAble":true,
-                    "props":{"y":0,"x":0,"width":16,"height":16},
-                    "nodeParent":12,
-                    "label":"BoxCollider",
-                    "isDirectory":false,
-                    "isAniNode":true,
-                    "hasChild":false,
-                    "compId":13,
-                    "child":[
-                        ]
-                },
-                {
-                    "x":30,
-                    "type":"RigidBody",
-                    "switchAble":true,
-                    "searchKey":"RigidBody",
-                    "removeAble":true,
-                    "props":{"type":"dynamic","gravityScale":0,"allowRotation":false},
-                    "nodeParent":12,
-                    "label":"RigidBody",
-                    "isDirectory":false,
-                    "isAniNode":true,
-                    "hasChild":false,
-                    "compId":14,
-                    "child":[
-                        ]
-                },
-                {
-                    "x":30,
-                    "type":"Script",
-                    "switchAble":true,
-                    "source":"src/character/GrassEnemy1.ts",
-                    "searchKey":"Script,GrassEnemy1",
-                    "removeAble":true,
-                    "props":{},
-                    "nodeParent":12,
-                    "label":"GrassEnemy1",
-                    "isDirectory":false,
-                    "isAniNode":true,
-                    "hasChild":false,
-                    "compId":16,
-                    "child":[
-                        ]
                 }]
         }],
     "animations":[

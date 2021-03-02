@@ -1,0 +1,10 @@
+{
+  "code": "import { GameControl } from \"./GameControl\";\r\nimport Player from \"../character/Player\";\r\nimport BattleImage from \"../map/BattleImage\";\r\nimport { RegionType } from \"../script/Region\";\r\nimport BattleMaps from \"../map/BattleMaps\";\r\nexport default class BattleScene extends Laya.Scene {\r\n    createChildren() {\r\n        super.createChildren();\r\n        this.loadScene(\"BattleScene\");\r\n    }\r\n    onAwake() {\r\n        this.battleimagedeal = new BattleImage(this.battlesprite);\r\n        this.battleimagedeal.initMap(RegionType.Grass, BattleMaps.bm1, 2);\r\n        let playercontroller = this.player.getComponent(Player);\r\n        playercontroller.HP = playercontroller.maxHP = 15;\r\n        this.controller = new GameControl(playercontroller);\r\n        console.log(this.player);\r\n        this.addChild(this.controller);\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/GameControl.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts",
+    "/Users/huanggaole/PCGZelda/src/map/BattleImage.ts",
+    "/Users/huanggaole/PCGZelda/src/script/Region.ts",
+    "/Users/huanggaole/PCGZelda/src/map/BattleMaps.ts"
+  ]
+}

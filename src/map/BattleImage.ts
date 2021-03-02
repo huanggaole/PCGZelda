@@ -1,16 +1,19 @@
 import { RegionType } from "../script/Region";
 import BattleMaps from "./BattleMaps";
 import EnemyFactory from "./EnemyFactory";
+import BulletFactory from "./BulletFactory";
 
 export default class BattleImage{
     tilePool:Laya.FontClip[][];
     enemyFactory:EnemyFactory;
+    bulletFactory:BulletFactory;
     mainsp:Laya.Sprite;
     static grasstilename = ["","匕","八","一"];
     constructor(battlesprite:Laya.Sprite){
         this.mainsp = battlesprite;
         this.tilePool = [];
         this.enemyFactory = new EnemyFactory(battlesprite);
+        this.bulletFactory = new BulletFactory(battlesprite);
         for(let j = 0; j < 5; j++){
             let tmppool = [];
             for(let i = 0; i < 10; i++){

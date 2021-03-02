@@ -61,8 +61,9 @@
     var CharacterAction;
     (function (CharacterAction) {
         CharacterAction[CharacterAction["None"] = 0] = "None";
-        CharacterAction[CharacterAction["RandomWalk"] = 1] = "RandomWalk";
-        CharacterAction[CharacterAction["Attack"] = 2] = "Attack";
+        CharacterAction[CharacterAction["Walk"] = 1] = "Walk";
+        CharacterAction[CharacterAction["RandomWalk"] = 2] = "RandomWalk";
+        CharacterAction[CharacterAction["Attack"] = 3] = "Attack";
     })(CharacterAction || (CharacterAction = {}));
     class Character extends Laya.Script {
         constructor() {
@@ -82,11 +83,32 @@
             this.directindex = 0;
             this.rigidbody = this.owner.getComponent(Laya.RigidBody);
         }
+        doTurnAround() {
+            if (Math.abs(this.dirx) > Math.abs(this.diry)) {
+                if (this.dirx > 0) {
+                    this.directindex = 3;
+                }
+                else {
+                    this.directindex = 2;
+                }
+            }
+            else {
+                if (this.diry > 0) {
+                    this.directindex = 0;
+                }
+                else {
+                    this.directindex = 1;
+                }
+            }
+            this.owner.value = Character.Values[0][this.directindex];
+        }
         doMove() {
             this.rigidbody.setVelocity({ x: this.x * this.speed, y: this.y * this.speed });
             if (this.x == 0 && this.y == 0) {
                 return;
             }
+            this.dirx = this.x;
+            this.diry = this.y;
             this.frame++;
             if (this.frame * this.speed >= 50) {
                 this.frame = 0;
@@ -129,12 +151,6 @@
     }
     Character.Values = [["一", "八", "匕", "厂"], ["刀", "儿", "二", "几"], ["力", "人", "入", "十"], ["又", "川", "寸", "大"], ["飞", "干", "工", "弓"], ["广", "己", "口", "马"], ["门", "女", "山", "尸"]];
 
-    class Player extends Character {
-        onUpdate() {
-            this.doMove();
-        }
-    }
-
     var Direction;
     (function (Direction) {
         Direction[Direction["None"] = 0] = "None";
@@ -152,19 +168,11 @@
         RegionType[RegionType["Lava"] = 4] = "Lava";
     })(RegionType || (RegionType = {}));
 
-    class BattleMaps {
-    }
-    BattleMaps.bm1 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [3, 0, 0, 0, 3, 0, 0, 0, 0, 3],
-        [3, 0, 3, 0, 0, 0, 0, 3, 0, 3],
-        [3, 0, 0, 0, 0, 3, 0, 0, 0, 3],
-        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-    ];
-
     class GrassEnemy1 extends Character {
         constructor() {
             super(...arguments);
             this.AItick = 0;
+            this.maxHP = 2;
         }
         onStart() {
             this.x = 0;
@@ -209,7 +217,7 @@
         constructor(battlesprite) {
             this.grassEnemies = [GrassEnemy1];
             this.mainsp = battlesprite;
-            this.enemylist = [];
+            EnemyFactory.enemylist = [];
         }
         initEnemy(regiontype, enemyforce) {
             let Enemies = [];
@@ -232,26 +240,179 @@
                 rigid.allowRotation = false;
                 let collider = fc.addComponent(Laya.BoxCollider);
                 collider.width = collider.height = 16;
-                fc.addComponent(Enemy);
-                this.enemylist.push(fc);
+                let enemy = fc.addComponent(Enemy);
+                enemy.HP = enemy.maxHP;
+                EnemyFactory.enemylist.push(fc);
                 this.mainsp.addChild(fc);
                 enemyforce -= Enemy.BattlePoint;
             }
         }
         clearEnemey() {
-            for (let i = 0; i < this.enemylist.length; i++) {
-                this.mainsp.removeChild(this.enemylist[i]);
-                this.enemylist[i].destroy();
+            for (let i = 0; i < EnemyFactory.enemylist.length; i++) {
+                this.mainsp.removeChild(EnemyFactory.enemylist[i]);
+                EnemyFactory.enemylist[i].destroy();
             }
-            this.enemylist = [];
+            EnemyFactory.enemylist = [];
         }
     }
+
+    class BulletFactory {
+        constructor(battlesprite) {
+            BulletFactory.mainsp = battlesprite;
+            BulletFactory.bulletlist = [];
+        }
+        static initBullet(BulletScript, x, y, dirx, diry) {
+            let bl = new Laya.Image(BulletScript.skin);
+            let rot = 0;
+            if (dirx == 0) {
+                if (diry > 0) {
+                    rot = 90;
+                }
+                else {
+                    rot = 270;
+                }
+            }
+            else {
+                rot = Math.atan2(diry, dirx) * 180 / 3.1415926;
+            }
+            bl.rotation = rot;
+            bl.x = x + 24 - BulletScript.width / 2;
+            bl.y = y + 24 - BulletScript.height / 2;
+            BulletFactory.bulletlist.push(bl);
+            BulletFactory.mainsp.addChild(bl);
+            bl.scale(BulletScript.scale, BulletScript.scale);
+            let rigid = bl.addComponent(Laya.RigidBody);
+            rigid.type = "dynamic";
+            rigid.gravityScale = 0;
+            rigid.setVelocity({ x: dirx * BulletScript.speed, y: diry * BulletScript.speed });
+            let collider = bl.addComponent(Laya.BoxCollider);
+            collider.width = BulletScript.width;
+            collider.height = BulletScript.height;
+            collider.isSensor = true;
+            let bs = bl.addComponent(BulletScript);
+        }
+        static clearBullet() {
+            for (let i = 0; i < BulletFactory.bulletlist.length; i++) {
+                BulletFactory.mainsp.removeChild(BulletFactory.bulletlist[i]);
+                BulletFactory.bulletlist[i].destroy();
+            }
+            BulletFactory.bulletlist = [];
+        }
+    }
+
+    class PlayerArrow extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onTriggerEnter(other) {
+            let player = other.owner.getComponent(Player);
+            if (player) {
+                console.log(true);
+            }
+            else {
+                let owner = this.owner;
+                BulletFactory.mainsp.removeChild(owner);
+                this.enabled = false;
+            }
+        }
+    }
+    PlayerArrow.skin = "Bullet/arrow.png";
+    PlayerArrow.scale = 2;
+    PlayerArrow.width = 13;
+    PlayerArrow.height = 5;
+    PlayerArrow.speed = 5;
+
+    class Player extends Character {
+        constructor() {
+            super(...arguments);
+            this.attacktick = 0;
+            this.attackInterval = 20;
+            this.attackPre = 2;
+            this.attackAft = 5;
+        }
+        onUpdate() {
+            if (this.x == 0 && this.y == 0 && EnemyFactory.enemylist.length > 0) {
+                this.attacktick++;
+                if (this.action != CharacterAction.Attack) {
+                    this.action = CharacterAction.Attack;
+                    this.attacktick = 0;
+                }
+                if (this.attacktick < this.attackInterval) {
+                    this.onAttackWait();
+                }
+                else if (this.attacktick < this.attackInterval + this.attackPre) {
+                    this.onAttackPre();
+                }
+                else if (this.attacktick == this.attackInterval + this.attackPre) {
+                    this.onAttackAft();
+                    this.doShoot();
+                }
+                else if (this.attacktick < this.attackInterval + this.attackPre + this.attackAft) {
+                    this.onAttackAft();
+                }
+                else {
+                    this.attacktick = 0;
+                }
+            }
+            else {
+                this.action = CharacterAction.Walk;
+            }
+            this.doMove();
+        }
+        onAttackWait() {
+            let enemyx = -1;
+            let enemyy = -1;
+            let mindist = 999999;
+            let owner = this.owner;
+            for (let i = 0; i < EnemyFactory.enemylist.length; i++) {
+                let enemy = EnemyFactory.enemylist[i];
+                let enemyHP = EnemyFactory.enemylist[i].getComponent(Character).HP;
+                if (enemyHP > 0) {
+                    let delx = enemy.x - owner.x;
+                    let dely = enemy.y - owner.y;
+                    let newdist = Math.sqrt(delx * delx + dely * dely);
+                    if (newdist < mindist) {
+                        enemyx = enemy.x;
+                        enemyy = enemy.y;
+                        mindist = newdist;
+                    }
+                }
+            }
+            let dirx = enemyx - owner.x;
+            let diry = enemyy - owner.y;
+            let mod = Math.sqrt(dirx * dirx + diry * diry);
+            this.dirx = dirx / mod;
+            this.diry = diry / mod;
+            this.doTurnAround();
+        }
+        onAttackPre() {
+            this.owner.value = Character.Values[4][this.directindex];
+        }
+        onAttackAft() {
+            this.owner.value = Character.Values[5][this.directindex];
+        }
+        doShoot() {
+            let owner = this.owner;
+            BulletFactory.initBullet(PlayerArrow, owner.x, owner.y, this.dirx, this.diry);
+        }
+    }
+
+    class BattleMaps {
+    }
+    BattleMaps.bm1 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [3, 0, 0, 0, 3, 0, 0, 0, 0, 3],
+        [3, 0, 3, 0, 0, 0, 0, 3, 0, 3],
+        [3, 0, 0, 0, 0, 3, 0, 0, 0, 3],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
 
     class BattleImage {
         constructor(battlesprite) {
             this.mainsp = battlesprite;
             this.tilePool = [];
             this.enemyFactory = new EnemyFactory(battlesprite);
+            this.bulletFactory = new BulletFactory(battlesprite);
             for (let j = 0; j < 5; j++) {
                 let tmppool = [];
                 for (let i = 0; i < 10; i++) {
@@ -297,6 +458,7 @@
             this.battleimagedeal = new BattleImage(this.battlesprite);
             this.battleimagedeal.initMap(RegionType.Grass, BattleMaps.bm1, 2);
             let playercontroller = this.player.getComponent(Player);
+            playercontroller.HP = playercontroller.maxHP = 15;
             this.controller = new GameControl(playercontroller);
             console.log(this.player);
             this.addChild(this.controller);

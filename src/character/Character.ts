@@ -38,11 +38,32 @@ export default class Character extends Laya.Script{
         this.rigidbody = this.owner.getComponent(Laya.RigidBody);
     }
 
+    doTurnAround(){
+        // 确定朝向
+        if(Math.abs(this.dirx) > Math.abs(this.diry)){
+            if(this.dirx > 0){
+                this.directindex = 3;
+            }else{
+                this.directindex = 2;
+            }
+        }else{
+            if(this.diry > 0){
+                this.directindex = 0;
+            }else{
+                this.directindex = 1;
+            }
+        }
+
+        (this.owner as Laya.FontClip).value = Character.Values[0][this.directindex];
+    }
+
     doMove(){
         this.rigidbody.setVelocity({x:this.x * this.speed,y:this.y * this.speed});
         if(this.x == 0 && this.y == 0){
             return;
         }
+        this.dirx = this.x;
+        this.diry = this.y;
         this.frame++;
         // 确定行走步数
         if(this.frame * this.speed >= 50){
@@ -74,6 +95,7 @@ export default class Character extends Laya.Script{
         this.x = 0;
         this.y = 0;
     }
+
     onSetRandomWalk(){
         this.x = 0.5 - Math.random();
         this.y = 0.5 - Math.random();
@@ -84,4 +106,5 @@ export default class Character extends Laya.Script{
         }
     }
     
+
 }
