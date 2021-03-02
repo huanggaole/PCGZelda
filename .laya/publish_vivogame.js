@@ -170,7 +170,7 @@ gulp.task("createProj_VIVO", ["createGlobalQGame_VIVO"], function() {
 					  fs.existsSync(projDir + "/sign");
 	if (isProjExist) {
 		// 检测是否需要升级
-		let packageCon = fs.readFileSync(`${projDir}/package.json`, "utf8");
+		let packageCon = fs.readFileSync(`${projDir}/tsconfig.json`, "utf8");
 		let minigamePath = path.join(projDir, "minigame.config.js");
 		if (packageCon.includes("@vivo-minigame/cli-service") && fs.existsSync(minigamePath)) {
 			return;
