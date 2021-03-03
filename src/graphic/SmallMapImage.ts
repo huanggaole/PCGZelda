@@ -14,7 +14,7 @@ export default class Smallthis extends Laya.Image{
 		for(let j = 0; j < height; j++){
 			for(let i = 0; i < width; i++){
 				if(map[j][i]==null){
-					this.graphics.drawRect(i*gridwidth,j*gridheight,gridwidth,gridheight,"#0000ff","#0000ff");
+					// this.graphics.drawRect(i*gridwidth,j*gridheight,gridwidth,gridheight,"#0000ff","#0000ff");
 				}else{
 					let tmpmap = map[j][i] as Region;
 					let groundcolor = "#00ff00";

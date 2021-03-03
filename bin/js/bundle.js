@@ -695,9 +695,7 @@
             this.height = 20 * height;
             for (let j = 0; j < height; j++) {
                 for (let i = 0; i < width; i++) {
-                    if (map[j][i] == null) {
-                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, "#0000ff", "#0000ff");
-                    }
+                    if (map[j][i] == null) ;
                     else {
                         let tmpmap = map[j][i];
                         let groundcolor = "#00ff00";
@@ -855,6 +853,9 @@
             this.owner.value = Character.Values[0][this.directindex];
         }
         doMove() {
+            if (!this.rigidbody) {
+                return;
+            }
             this.rigidbody.setVelocity({ x: this.x * this.speed, y: this.y * this.speed });
             if (this.x == 0 && this.y == 0) {
                 return;
@@ -908,6 +909,20 @@
             }
         }
         removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
             Laya.Pool.recover('EnemyType', owner);
             BulletFactory.mainsp.removeChild(owner);
         }
@@ -1041,6 +1056,20 @@
             }
         }
         removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
             BulletFactory.mainsp.removeChild(owner);
             Laya.Pool.recover('BulletType', owner);
         }
@@ -1137,28 +1166,122 @@
         }
     }
 
+    class toDown extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                BattleScene.tmpMapY += 1;
+                BattleScene.switchMap(0, -400);
+                this.conce = false;
+                Laya.timer.once(500, this, () => { this.conce = true; });
+            }
+        }
+    }
+
+    class toUp extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                BattleScene.tmpMapY -= 1;
+                BattleScene.switchMap(0, 400);
+                this.conce = false;
+                Laya.timer.once(500, this, () => { this.conce = true; });
+            }
+        }
+    }
+
+    class toLeft extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                BattleScene.tmpMapX -= 1;
+                BattleScene.switchMap(880, 0);
+                this.conce = false;
+                Laya.timer.once(500, this, () => { this.conce = true; });
+            }
+        }
+    }
+
+    class toRight extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                BattleScene.tmpMapX += 1;
+                BattleScene.switchMap(-880, 0);
+                this.conce = false;
+                Laya.timer.once(500, this, () => { this.conce = true; });
+            }
+        }
+    }
+
     class BattleImage {
         constructor(battlesprite) {
+            this.ifcanMove = true;
             this.mainsp = battlesprite;
             this.tilePool = [];
         }
         initMap(regiontype, battlemap, enemyforce) {
             this.enemyFactory = new EnemyFactory(this.mainsp);
             this.bulletFactory = new BulletFactory(this.mainsp);
+            console.log(this.mainsp.numChildren);
+            for (let i = 0; i < this.mainsp.numChildren; i++) {
+                let c = this.mainsp.getChildAt(i);
+                let d = c.getComponent(toDown);
+                let u = c.getComponent(toUp);
+                let l = c.getComponent(toLeft);
+                let r = c.getComponent(toRight);
+                if (d) {
+                    d.conce = true;
+                }
+                if (u) {
+                    u.conce = true;
+                }
+                if (l) {
+                    l.conce = true;
+                }
+                if (r) {
+                    r.conce = true;
+                }
+            }
             for (let j = 0; j < 5; j++) {
                 let tmppool = [];
                 for (let i = 0; i < 10; i++) {
-                    let tmptile = new Laya.FontClip("Battle/map1.png", "一八匕厂刀儿二几力人 入十又川寸大飞干工弓 广己口马门女山尸士巳 土兀夕小子贝比长车歹 斗厄方风父戈户火见斤");
-                    let tmprigid = tmptile.addComponent(Laya.RigidBody);
+                    let tmptile = Laya.Pool.getItemByClass('TileType', Laya.FontClip);
+                    tmptile.skin = "Battle/map1.png";
+                    tmptile.sheet = "一八匕厂刀儿二几力人 入十又川寸大飞干工弓 广己口马门女山尸士巳 土兀夕小子贝比长车歹 斗厄方风父戈户火见斤";
+                    let tmprigid = tmptile.getComponent(Laya.RigidBody);
+                    if (!tmprigid) {
+                        tmprigid = tmptile.addComponent(Laya.RigidBody);
+                    }
                     tmprigid.type = "static";
                     tmprigid.gravityScale = 0;
-                    let tmpcld = tmptile.addComponent(Laya.BoxCollider);
+                    let tmpcld = tmptile.getComponent(Laya.BoxCollider);
+                    if (!tmpcld) {
+                        tmpcld = tmptile.addComponent(Laya.BoxCollider);
+                    }
                     tmpcld.width = tmpcld.height = 96;
                     tmptile.x = 96 * i;
                     tmptile.y = 96 * j;
                     tmppool.push(tmptile);
                 }
                 this.tilePool.push(tmppool);
+                this.ifcanMove = true;
             }
             BattleMaps.currentBattleMap = battlemap;
             for (let j = 0; j < 5; j++) {
@@ -1176,21 +1299,40 @@
             }
             this.enemyFactory.initEnemy(regiontype, enemyforce);
         }
+        clearTiles() {
+            for (let j = 0; j < 5; j++) {
+                for (let i = 0; i < 10; i++) {
+                    this.mainsp.removeChild(this.tilePool[j][i]);
+                    let rg = this.tilePool[j][i].getComponent(Laya.RigidBody);
+                    let bc = this.tilePool[j][i].getComponent(Laya.BoxCollider);
+                    if (rg) {
+                        rg.enabled = false;
+                    }
+                    if (bc) {
+                        bc.enabled = false;
+                    }
+                    if (bc) {
+                        this.tilePool[j][i]._destroyComponent(bc);
+                    }
+                    if (rg) {
+                        this.tilePool[j][i]._destroyComponent(rg);
+                    }
+                    Laya.Pool.recover('TileType', this.tilePool[j][i]);
+                }
+            }
+        }
     }
     BattleImage.grasstilename = ["", "一", "八", "匕", "厂", "刀", "儿", "二"];
 
     class BattleScene extends Laya.Scene {
         constructor(regionmap) {
             super();
-            this.battleindex = 0;
-            this.tmpMapX = 0;
-            this.tmpMapY = 0;
-            this.regionmap = regionmap;
+            BattleScene.regionmap = regionmap;
             for (let j = 0; j < regionmap.length; j++) {
                 for (let i = 0; i < regionmap[0].length; i++) {
                     if (regionmap[j][i] && regionmap[j][i].node.type == NodeType.e) {
-                        this.tmpMapX = i;
-                        this.tmpMapY = j;
+                        BattleScene.tmpMapX = i;
+                        BattleScene.tmpMapY = j;
                     }
                 }
             }
@@ -1200,21 +1342,42 @@
             this.loadScene("BattleScene");
         }
         onAwake() {
-            this.battleimagedeal = [];
-            this.battleimagedeal.push(new BattleImage(this.battlesprite1));
-            this.battleimagedeal.push(new BattleImage(this.battlesprite2));
-            let tmpregion = this.regionmap[this.tmpMapY][this.tmpMapX];
-            this.battleimagedeal[this.battleindex].initMap(tmpregion.regiontype, tmpregion.tileArray, 2);
-            this.battleimagedeal[this.battleindex].mainsp.visible = true;
-            this.battleimagedeal[1 - this.battleindex].mainsp.visible = false;
+            BattleScene.battleimagedeal = [];
+            BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite1));
+            BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite2));
+            let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+            BattleScene.battleimagedeal[BattleScene.battleindex].initMap(tmpregion.regiontype, tmpregion.tileArray, tmpregion.enmeyForce);
+            BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
+            BattleScene.battleimagedeal[1 - BattleScene.battleindex].mainsp.visible = false;
             let playercontroller = this.player.getComponent(Player);
             playercontroller.HP = playercontroller.maxHP = 15;
-            let MapImage = new Smallthis(this.regionmap);
+            BattleScene.player = this.player;
+            let MapImage = new Smallthis(BattleScene.regionmap);
             this.addChild(MapImage);
             this.controller = new GameControl(playercontroller);
             this.addChild(this.controller);
         }
+        static switchMap(delx, dely) {
+            console.log(BattleScene.regionmap);
+            let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+            let preindex = BattleScene.battleindex;
+            let nowindex = BattleScene.battleindex = 1 - BattleScene.battleindex;
+            EnemyFactory.clearEnemey();
+            BattleScene.battleimagedeal[preindex].clearTiles();
+            BattleScene.battleimagedeal[preindex].mainsp.removeChild(BattleScene.player);
+            BattleScene.battleimagedeal[preindex].mainsp.x = -2000;
+            BattleScene.battleimagedeal[nowindex].mainsp.x = 0;
+            BattleScene.battleimagedeal[nowindex].initMap(tmpregion.regiontype, tmpregion.tileArray, tmpregion.enmeyForce);
+            BattleScene.player.x += delx;
+            BattleScene.player.y += dely;
+            console.log(BattleScene.player);
+            BattleScene.battleimagedeal[nowindex].mainsp.addChild(BattleScene.player);
+            BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
+        }
     }
+    BattleScene.battleindex = 0;
+    BattleScene.tmpMapX = 0;
+    BattleScene.tmpMapY = 0;
 
     class GameConfig {
         constructor() { }
@@ -1224,6 +1387,10 @@
             reg("character/Character.ts", Character);
             reg("character/Player.ts", Player);
             reg("character/GrassEnemy1.ts", GrassEnemy1);
+            reg("events/toUp.ts", toUp);
+            reg("events/toDown.ts", toDown);
+            reg("events/toLeft.ts", toLeft);
+            reg("events/toRight.ts", toRight);
         }
     }
     GameConfig.width = 960;
@@ -1236,7 +1403,7 @@
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;
     GameConfig.stat = false;
-    GameConfig.physicsDebug = false;
+    GameConfig.physicsDebug = true;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
 

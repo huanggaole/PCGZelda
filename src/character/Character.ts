@@ -62,6 +62,9 @@ export default class Character extends Laya.Script{
     }
 
     doMove(){
+        if(!this.rigidbody){
+            return;
+        }
         this.rigidbody.setVelocity({x:this.x * this.speed,y:this.y * this.speed});
         if(this.x == 0 && this.y == 0){
             return;
@@ -119,6 +122,20 @@ export default class Character extends Laya.Script{
         }
     }
     removeOwner(owner){
+        let rg = owner.getComponent(Laya.RigidBody) as Laya.RigidBody;
+        let bc = owner.getComponent(Laya.BoxCollider) as Laya.BoxCollider;
+        if(rg){
+            rg.enabled = false;
+        }
+        if(bc){
+            bc.enabled = false;
+        }
+        if(bc){
+            owner._destroyComponent(bc);
+        }
+        if(rg){
+            owner._destroyComponent(rg);
+        }
         Laya.Pool.recover('EnemyType',owner);
         BulletFactory.mainsp.removeChild(owner);
     }
