@@ -223,7 +223,7 @@ export default class Map{
 
                 // 设置地形
 
-                this.setRegionType(map,oriG.nodes[0].PlaceinGrid.x,oriG.nodes[0].PlaceinGrid.y,RegionType.Grass);
+                this.setRegionType(map,oriG.nodes[0].PlaceinGrid.x,oriG.nodes[0].PlaceinGrid.y,RegionType.Grass,2);
                 break;
             }
             if(count > 100){
@@ -234,7 +234,7 @@ export default class Map{
         return map;
     }
 
-    static setRegionType(map:any[],x:number,y:number,type:RegionType){
+    static setRegionType(map:any[],x:number,y:number,type:RegionType,force:number){
         let region = map[y][x] as Region
         if(region.regiontype != RegionType.Undefined){
             return;
@@ -243,6 +243,7 @@ export default class Map{
             type = RegionType.Lava;
         }
         region.regiontype = type;
+        region.enmeyForce = force;
         if(region.upConnect){
             let rnd = Math.random();
             let newtype = type;
@@ -253,7 +254,11 @@ export default class Map{
             }else if(rnd < 0.3){
                 newtype = RegionType.Snow;
             }
-            this.setRegionType(map, x, y - 1, newtype);
+            region.tileArray[0][3] = 7;
+            region.tileArray[0][4] = 0;
+            region.tileArray[0][5] = 0;
+            region.tileArray[0][6] = 6;            
+            this.setRegionType(map, x, y - 1, newtype, force + 1);
         }
         if(region.downConnect){
             let rnd = Math.random();
@@ -265,7 +270,11 @@ export default class Map{
             }else if(rnd < 0.3){
                 newtype = RegionType.Snow;
             }
-            this.setRegionType(map, x, y + 1, newtype);
+            region.tileArray[4][3] = 4;
+            region.tileArray[4][4] = 0;
+            region.tileArray[4][5] = 0;
+            region.tileArray[4][6] = 5;
+            this.setRegionType(map, x, y + 1, newtype, force + 1);
         }
         if(region.leftConnect){
             let rnd = Math.random();
@@ -277,7 +286,8 @@ export default class Map{
             }else if(rnd < 0.3){
                 newtype = RegionType.Snow;
             }
-            this.setRegionType(map, x - 1, y, newtype);
+            region.tileArray[2][0] = 0;
+            this.setRegionType(map, x - 1, y, newtype, force + 1);
         }
         if(region.rightConnect){
             let rnd = Math.random();
@@ -289,7 +299,8 @@ export default class Map{
             }else if(rnd < 0.3){
                 newtype = RegionType.Snow;
             }
-            this.setRegionType(map, x + 1, y, newtype);
+            region.tileArray[2][9] = 0;
+            this.setRegionType(map, x + 1, y, newtype, force + 1);
         }
     }
 }

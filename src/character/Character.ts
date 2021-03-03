@@ -1,3 +1,7 @@
+import BattleScene from "../scene/BattleScene";
+import BulletFactory from "../map/BulletFactory";
+import EnemyFactory from "../map/EnemyFactory";
+
 export enum CharacterAction{
     None,
     Walk,
@@ -106,5 +110,16 @@ export default class Character extends Laya.Script{
         }
     }
     
-
+    onUpdate(){
+        if(this.HP <= 0){
+            (this.owner as Laya.FontClip).x = -100;
+            (this.owner as Laya.FontClip).y = -100;
+            this.removeOwner(this.owner);
+            // this.enabled = false;
+        }
+    }
+    removeOwner(owner){
+        Laya.Pool.recover('EnemyType',owner);
+        BulletFactory.mainsp.removeChild(owner);
+    }
 }

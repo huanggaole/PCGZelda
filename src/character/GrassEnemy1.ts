@@ -17,6 +17,7 @@ export default class GrassEnemy1 extends Character{
     }
 
     onUpdate(){
+        super.onUpdate();
         this.AI();
     }
 

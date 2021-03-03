@@ -1,7 +1,10 @@
 D .
 D Battle
 R F9A38A5D GrassLand.png
-R 9401C138 map1.png
+R 29E2F76B LavaLand.png
+R B0EFAB9B map1.png
+R 929AA6B8 SandLand.png
+R 8FC4D1F1 SnowLand.png
 D Bullet
 P D7F38ACD arrow.png
 D comp

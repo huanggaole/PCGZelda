@@ -1,6 +1,630 @@
 (function () {
     'use strict';
 
+    var NodeType;
+    (function (NodeType) {
+        NodeType[NodeType["S"] = 0] = "S";
+        NodeType[NodeType["e"] = 1] = "e";
+        NodeType[NodeType["t"] = 2] = "t";
+        NodeType[NodeType["b"] = 3] = "b";
+        NodeType[NodeType["g"] = 4] = "g";
+        NodeType[NodeType["l"] = 5] = "l";
+        NodeType[NodeType["k"] = 6] = "k";
+        NodeType[NodeType["T"] = 7] = "T";
+        NodeType[NodeType["Any"] = 8] = "Any";
+    })(NodeType || (NodeType = {}));
+    class Node {
+        constructor(_index, _type, _pointto, _keyto = []) {
+            this.index = _index;
+            this.type = _type;
+            this.pointTo = _pointto;
+            this.candidates = [];
+            this.keyTo = _keyto;
+            let x = -1;
+            let y = -1;
+            this.PlaceinGrid = { x, y };
+        }
+        ifcandidate(node) {
+            if (node.type == this.type) {
+                for (let i = 0; i < this.countTypeNum.length; i++) {
+                    if (this.countTypeNum[i] > node.countTypeNum[i]) {
+                        return;
+                    }
+                }
+                this.candidates.push(node.index);
+            }
+        }
+    }
+
+    class Graphic {
+        constructor() {
+            this.typename = [
+                "S",
+                "e",
+                "t",
+                "b",
+                "g",
+                "l",
+                "k",
+                "T",
+                "Any"
+            ];
+        }
+        countTypeNums() {
+            for (let index = 0; index < this.nodes.length; index++) {
+                let node = this.nodes[index];
+                node.countTypeNum = [];
+                for (let i = 0; i < this.typename.length; i++) {
+                    node.countTypeNum.push(0);
+                }
+                for (let i = 0; i < node.pointTo.length; i++) {
+                    node.countTypeNum[this.nodes[node.pointTo[i]].type]++;
+                }
+            }
+        }
+        printGraphic() {
+            for (let i = 0; i < this.nodes.length; i++) {
+                let out = i + this.typename[this.nodes[i].type] + "->";
+                for (let j = 0; j < this.nodes[i].pointTo.length; j++) {
+                    let index = this.nodes[i].pointTo[j];
+                    out += index + this.typename[this.nodes[index].type] + ",";
+                }
+                if (this.nodes[i].keyTo.length > 0) {
+                    out += "keyto:";
+                    for (let j = 0; j < this.nodes[i].keyTo.length; j++) {
+                        let index = this.nodes[i].keyTo[j];
+                        out += index + this.typename[this.nodes[index].type] + ",";
+                    }
+                }
+                console.log(out);
+            }
+        }
+        printCandidates() {
+            for (let i = 0; i < this.nodes.length; i++) {
+                console.log(this.nodes[i].candidates);
+            }
+        }
+        getMatrix() {
+            if (this.matrix == null) {
+                let matrix = [];
+                for (let j = 0; j < this.nodes.length; j++) {
+                    for (let i = 0; i < this.nodes.length; i++) {
+                        matrix.push(0);
+                    }
+                }
+                for (let j = 0; j < this.nodes.length; j++) {
+                    for (let i = 0; i < this.nodes[j].pointTo.length; i++) {
+                        matrix[j * this.nodes.length + this.nodes[j].pointTo[i]] = 1;
+                    }
+                }
+                this.matrix = matrix;
+            }
+            return this.matrix;
+        }
+        getSubMatrix(indices) {
+            let matrix = [];
+            for (let j = 0; j < indices.length; j++) {
+                for (let i = 0; i < indices.length; i++) {
+                    matrix.push(0);
+                }
+            }
+            for (let j = 0; j < indices.length; j++) {
+                for (let i = 0; i < this.nodes[indices[j]].pointTo.length; i++) {
+                    let pt = this.nodes[indices[j]].pointTo[i];
+                    let newindex = indices.indexOf(pt);
+                    if (newindex > -1) {
+                        matrix[j * indices.length + newindex] = 1;
+                    }
+                }
+            }
+            return matrix;
+        }
+        clearSubMatrixEdges(indices) {
+            for (let j = 0; j < indices.length; j++) {
+                for (let i = 0; i < this.nodes[indices[j]].pointTo.length; i++) {
+                    let pt = this.nodes[indices[j]].pointTo[i];
+                    let newindex = indices.indexOf(pt);
+                    if (newindex > -1) {
+                        this.nodes[indices[j]].pointTo = this.nodes[indices[j]].pointTo.filter(item => item != pt);
+                    }
+                }
+            }
+        }
+        addNewNodes(indices, newG) {
+            while (newG.nodes.length > indices.length) {
+                let newnode = new Node(this.nodes.length, newG.nodes[indices.length].type, []);
+                this.nodes.push(newnode);
+                indices.push(newnode.index);
+            }
+            for (let i = 0; i < newG.nodes.length; i++) {
+                this.nodes[indices[i]].type = newG.nodes[i].type;
+            }
+        }
+        addNewEdges(indices, newG) {
+            for (let i = 0; i < newG.nodes.length; i++) {
+                for (let j = 0; j < newG.nodes[i].pointTo.length; j++) {
+                    this.nodes[indices[i]].pointTo.push(indices[newG.nodes[i].pointTo[j]]);
+                }
+                if (this.nodes[indices[i]].type == NodeType.k) {
+                    for (let j = 0; j < newG.nodes[i].keyTo.length; j++) {
+                        this.nodes[indices[i]].keyTo.push(indices[newG.nodes[i].keyTo[j]]);
+                    }
+                }
+            }
+        }
+    }
+
+    class GraphOperations {
+        static FindSubGraph(oriG, subG) {
+            oriG.countTypeNums();
+            subG.countTypeNums();
+            console.log("oriG");
+            oriG.printGraphic();
+            console.log("subG");
+            subG.printGraphic();
+            for (let i = 0; i < subG.nodes.length; i++) {
+                let subN = subG.nodes[i];
+                subN.candidates = [];
+                for (let j = 0; j < oriG.nodes.length; j++) {
+                    let oriN = oriG.nodes[j];
+                    subN.ifcandidate(oriN);
+                }
+            }
+            subG.printCandidates();
+            GraphOperations.MatchRes = [];
+            let match = [];
+            GraphOperations.countMatch(oriG, subG, 0, match);
+            return GraphOperations.MatchRes;
+        }
+        static FindTs(oriG) {
+            GraphOperations.MatchRes = [];
+            for (let i = 0; i < oriG.nodes.length; i++) {
+                for (let j = 0; j < oriG.nodes[i].pointTo.length; j++) {
+                    let tempT = oriG.nodes[oriG.nodes[i].pointTo[j]];
+                    if (tempT.type == NodeType.T) {
+                        for (let k = 0; k < tempT.pointTo.length; k++) {
+                            let match = [i, oriG.nodes[i].pointTo[j], tempT.pointTo[k]];
+                            GraphOperations.MatchRes.push(match);
+                        }
+                    }
+                }
+            }
+            return GraphOperations.MatchRes;
+        }
+        static FindLs(oriG) {
+            GraphOperations.MatchRes = [];
+            for (let i = 0; i < oriG.nodes.length; i++) {
+                for (let j = 0; j < oriG.nodes[i].pointTo.length; j++) {
+                    let tempN = oriG.nodes[oriG.nodes[i].pointTo[j]];
+                    for (let k = 0; k < tempN.pointTo.length; k++) {
+                        let tempL = oriG.nodes[tempN.pointTo[k]];
+                        if (tempL.type == NodeType.l) {
+                            let match = [i, oriG.nodes[i].pointTo[j], tempN.pointTo[k]];
+                            GraphOperations.MatchRes.push(match);
+                        }
+                    }
+                }
+            }
+            return GraphOperations.MatchRes;
+        }
+        static countMatch(oriG, subG, index, match) {
+            if (index == subG.nodes.length) {
+                let subM = subG.getMatrix();
+                let oriM = oriG.getSubMatrix(match);
+                let ifaccept = true;
+                for (let i = 0; i < subM.length; i++) {
+                    if (subM[i] == 1 && oriM[i] == 0) {
+                        ifaccept = false;
+                    }
+                }
+                if (ifaccept) {
+                    GraphOperations.MatchRes.push(match);
+                }
+                return true;
+            }
+            if (subG.nodes[index].candidates.length == 0) {
+                return false;
+            }
+            for (let i = 0; i < subG.nodes[index].candidates.length; i++) {
+                let candidate = subG.nodes[index].candidates[i];
+                let tmpMatch = [];
+                for (let j = 0; j < match.length; j++) {
+                    tmpMatch.push(match[j]);
+                }
+                tmpMatch.push(candidate);
+                if (!GraphOperations.countMatch(oriG, subG, index + 1, tmpMatch)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        static changeOriG(oriG, subG, newG, match) {
+            oriG.clearSubMatrixEdges(match);
+            oriG.addNewNodes(match, newG);
+            oriG.addNewEdges(match, newG);
+            oriG.countTypeNums();
+            console.log("==========");
+            oriG.printGraphic();
+            console.log("==========");
+        }
+    }
+
+    class Rules {
+        static initRules() {
+            this.startpre = new Graphic();
+            this.startnew = new Graphic();
+            this.addpre = new Graphic();
+            this.add1new = new Graphic();
+            this.add2new = new Graphic();
+            this.add3new = new Graphic();
+            this.defineT1new = new Graphic();
+            this.defineT2new = new Graphic();
+            this.defineLnew = new Graphic();
+            this.startpre.nodes = [new Node(0, NodeType.S, [])];
+            this.startnew.nodes = [new Node(0, NodeType.e, [1]), new Node(1, NodeType.T, [2]), new Node(2, NodeType.g, [])];
+            this.addpre.nodes = [new Node(0, NodeType.T, [1]), new Node(1, NodeType.g, [])];
+            this.add1new.nodes = [new Node(0, NodeType.b, [1]), new Node(1, NodeType.g, [])];
+            this.add2new.nodes = [new Node(0, NodeType.T, [1]), new Node(1, NodeType.T, [2]), new Node(2, NodeType.g, [])];
+            this.add3new.nodes = [new Node(0, NodeType.T, [1]), new Node(1, NodeType.T, [2]), new Node(2, NodeType.T, [3]), new Node(3, NodeType.g, [])];
+        }
+        static setDefineT1new(oriG, match) {
+            this.defineT1new.nodes = [];
+            let node0 = new Node(0, oriG.nodes[match[0]].type, [1]);
+            let node1 = new Node(1, NodeType.t, [2]);
+            let node2 = new Node(2, oriG.nodes[match[2]].type, []);
+            this.defineT1new.nodes = [node0, node1, node2];
+        }
+        static setDefineT2new(oriG, match) {
+            this.defineT2new.nodes = [];
+            let node0 = new Node(0, oriG.nodes[match[0]].type, [1, 3]);
+            let node1 = new Node(1, NodeType.l, [2]);
+            let node2 = new Node(2, oriG.nodes[match[2]].type, []);
+            let node3 = new Node(3, NodeType.k, [], [1]);
+            this.defineT2new.nodes = [node0, node1, node2, node3];
+        }
+        static setDefineLnew(oriG, match) {
+            this.defineLnew.nodes = [];
+            let node0 = new Node(0, oriG.nodes[match[0]].type, [1, 2]);
+            let node1 = new Node(1, oriG.nodes[match[1]].type, []);
+            let node2 = new Node(2, oriG.nodes[match[2]].type, []);
+            this.defineLnew.nodes = [node0, node1, node2];
+        }
+    }
+
+    class BattleMaps {
+    }
+    BattleMaps.bm1 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
+
+    var Direction;
+    (function (Direction) {
+        Direction[Direction["None"] = 0] = "None";
+        Direction[Direction["UP"] = 1] = "UP";
+        Direction[Direction["Down"] = 2] = "Down";
+        Direction[Direction["Left"] = 3] = "Left";
+        Direction[Direction["Right"] = 4] = "Right";
+    })(Direction || (Direction = {}));
+    var RegionType;
+    (function (RegionType) {
+        RegionType[RegionType["Undefined"] = 0] = "Undefined";
+        RegionType[RegionType["Grass"] = 1] = "Grass";
+        RegionType[RegionType["Desert"] = 2] = "Desert";
+        RegionType[RegionType["Snow"] = 3] = "Snow";
+        RegionType[RegionType["Lava"] = 4] = "Lava";
+    })(RegionType || (RegionType = {}));
+    class Region {
+        constructor(_index) {
+            this.index = _index;
+            this.upConnect = false;
+            this.downConnect = false;
+            this.leftConnect = false;
+            this.rightConnect = false;
+            this.regiontype = RegionType.Undefined;
+            let targetMap = BattleMaps.bm1;
+            this.tileArray = [];
+            for (let j = 0; j < targetMap.length; j++) {
+                let tmprow = [];
+                for (let i = 0; i < targetMap[0].length; i++) {
+                    tmprow.push(targetMap[j][i]);
+                }
+                this.tileArray.push(tmprow);
+            }
+            this.enmeyForce = 2;
+        }
+    }
+
+    class Map {
+        static generateWorld() {
+            Rules.initRules();
+            let oriG = new Graphic();
+            oriG.nodes = [new Node(0, NodeType.S, [])];
+            let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.startpre);
+            let match = MatchRes[0];
+            GraphOperations.changeOriG(oriG, Rules.startpre, Rules.startnew, match);
+            for (let i = 0; i < 12; i++) {
+                let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.addpre);
+                let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
+                if (Math.random() < 0.5) {
+                    GraphOperations.changeOriG(oriG, Rules.addpre, Rules.add2new, match);
+                }
+                else {
+                    GraphOperations.changeOriG(oriG, Rules.addpre, Rules.add3new, match);
+                }
+            }
+            MatchRes = GraphOperations.FindSubGraph(oriG, Rules.addpre);
+            match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
+            GraphOperations.changeOriG(oriG, Rules.addpre, Rules.add1new, match);
+            oriG.countTypeNums();
+            oriG.printGraphic();
+            while (true) {
+                let MatchRes = GraphOperations.FindTs(oriG);
+                if (MatchRes.length == 0) {
+                    break;
+                }
+                let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
+                if (Math.random() < 0.5) {
+                    Rules.setDefineT1new(oriG, match);
+                    GraphOperations.changeOriG(oriG, Rules.addpre, Rules.defineT1new, match);
+                }
+                else {
+                    Rules.setDefineT2new(oriG, match);
+                    GraphOperations.changeOriG(oriG, Rules.addpre, Rules.defineT2new, match);
+                }
+            }
+            for (let i = 0; i < 10; i++) {
+                let MatchRes = GraphOperations.FindLs(oriG);
+                if (MatchRes.length == 0) {
+                    break;
+                }
+                let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
+                Rules.setDefineLnew(oriG, match);
+                GraphOperations.changeOriG(oriG, Rules.addpre, Rules.defineLnew, match);
+            }
+            let map = Map.GenotoPheno(oriG);
+            return map;
+        }
+        static setGrid(oriG, index, map, size, gridindex, unoccupied, rect) {
+            let res = true;
+            map[gridindex] = index;
+            let x = gridindex % (size);
+            let y = Math.floor((gridindex - x) / (size));
+            if (x < rect.minx) {
+                rect.minx = x;
+            }
+            if (x > rect.maxx) {
+                rect.maxx = x;
+            }
+            if (y < rect.miny) {
+                rect.miny = y;
+            }
+            if (y > rect.maxy) {
+                rect.maxy = y;
+            }
+            if (x > 0 && map[y * size + x - 1] == -1 && unoccupied.indexOf(y * size + x - 1) == -1) {
+                unoccupied.push(y * size + x - 1);
+            }
+            if (x < size - 1 && map[y * size + x + 1] == -1 && unoccupied.indexOf(y * size + x + 1) == -1) {
+                unoccupied.push(y * size + x + 1);
+            }
+            if (y > 0 && map[(y - 1) * size + x] == -1 && unoccupied.indexOf((y - 1) * size + x) == -1) {
+                unoccupied.push((y - 1) * size + x);
+            }
+            if (y < size - 1 && map[(y + 1) * size + x] == -1 && unoccupied.indexOf((y + 1) * size + x) == -1) {
+                unoccupied.push((y + 1) * size + x);
+            }
+            if (oriG.nodes[index].pointTo.length > unoccupied.length) {
+                if (unoccupied.length == 0) {
+                    return false;
+                }
+                let randomUindex = Math.floor(Math.random() * unoccupied.length);
+                let newGridindex = unoccupied[randomUindex];
+                unoccupied = unoccupied.filter(item => item != newGridindex);
+                res = res && this.setGrid(oriG, index, map, size, newGridindex, unoccupied, rect);
+            }
+            else {
+                let forchild = [];
+                for (let i = 0; i < oriG.nodes[index].pointTo.length; i++) {
+                    let randomUindex = Math.floor(Math.random() * unoccupied.length);
+                    let newGridindex = unoccupied[randomUindex];
+                    forchild.push(newGridindex);
+                    unoccupied = unoccupied.filter(item => item != newGridindex);
+                    map[newGridindex] = oriG.nodes[index].pointTo[i];
+                }
+                for (let i = 0; i < oriG.nodes[index].pointTo.length; i++) {
+                    res = res && this.setGrid(oriG, oriG.nodes[index].pointTo[i], map, size, forchild[i], [], rect);
+                }
+            }
+            return res;
+        }
+        static GenotoPheno(oriG) {
+            let size = Math.ceil(Math.sqrt(oriG.nodes.length)) * 2;
+            let map = [];
+            for (let j = 0; j < size; j++) {
+                for (let i = 0; i < size; i++) {
+                    map.push(-1);
+                }
+            }
+            let count = 0;
+            while (true) {
+                let initindex = Math.floor(size / 2) * size + Math.floor(size / 2);
+                let minx = initindex % size;
+                let maxx = initindex % size;
+                let miny = (initindex - minx) / size;
+                let maxy = (initindex - maxx) / size;
+                let rect = { minx, maxx, miny, maxy };
+                let res = this.setGrid(oriG, 0, map, size, initindex, [], rect);
+                count++;
+                if (res) {
+                    let width = rect.maxx - rect.minx + 1;
+                    let height = rect.maxy - rect.miny + 1;
+                    let tmpcol = [];
+                    for (let j = 0; j < height; j++) {
+                        let tmprow = [];
+                        for (let i = 0; i < width; i++) {
+                            if (map[(rect.miny + j) * size + rect.minx + i] == -1) {
+                                tmprow.push(null);
+                            }
+                            else {
+                                let index = map[(rect.miny + j) * size + rect.minx + i];
+                                let newregion = new Region(index);
+                                tmprow.push(newregion);
+                            }
+                        }
+                        tmpcol.push(tmprow);
+                    }
+                    map = tmpcol;
+                    for (let j = 0; j < height; j++) {
+                        for (let i = 0; i < width; i++) {
+                            if (map[j][i] != null) {
+                                let curmap = map[j][i];
+                                let index = curmap.index;
+                                curmap.node = oriG.nodes[index];
+                                let pointto = oriG.nodes[index].pointTo;
+                                if (curmap.node.PlaceinGrid.x == -1 && curmap.node.PlaceinGrid.y == -1) {
+                                    curmap.node.PlaceinGrid.x = i;
+                                    curmap.node.PlaceinGrid.y = j;
+                                }
+                                else {
+                                    curmap.node = new Node(curmap.node.index, NodeType.T, curmap.node.keyTo);
+                                    curmap.node.PlaceinGrid.x = i;
+                                    curmap.node.PlaceinGrid.y = j;
+                                }
+                                if (j > 0) {
+                                    let tmpmap = map[(j - 1)][i];
+                                    if (tmpmap != null) {
+                                        let tmpindex = tmpmap.index;
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
+                                            curmap.upConnect = true;
+                                            tmpmap.downConnect = true;
+                                        }
+                                    }
+                                }
+                                if (j < height - 1) {
+                                    let tmpmap = map[(j + 1)][i];
+                                    if (tmpmap != null) {
+                                        let tmpindex = tmpmap.index;
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
+                                            curmap.downConnect = true;
+                                            tmpmap.upConnect = true;
+                                        }
+                                    }
+                                }
+                                if (i > 0) {
+                                    let tmpmap = map[j][i - 1];
+                                    if (tmpmap != null) {
+                                        let tmpindex = tmpmap.index;
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
+                                            curmap.leftConnect = true;
+                                            tmpmap.rightConnect = true;
+                                        }
+                                    }
+                                }
+                                if (i < width - 1) {
+                                    let tmpmap = map[j][i + 1];
+                                    if (tmpmap != null) {
+                                        let tmpindex = tmpmap.index;
+                                        if (pointto.indexOf(tmpindex) > -1 || tmpindex == index) {
+                                            curmap.rightConnect = true;
+                                            tmpmap.leftConnect = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    this.setRegionType(map, oriG.nodes[0].PlaceinGrid.x, oriG.nodes[0].PlaceinGrid.y, RegionType.Grass, 2);
+                    break;
+                }
+                if (count > 100) {
+                    console.log("映射失败！");
+                    break;
+                }
+            }
+            return map;
+        }
+        static setRegionType(map, x, y, type, force) {
+            let region = map[y][x];
+            if (region.regiontype != RegionType.Undefined) {
+                return;
+            }
+            if (region.node.type == NodeType.b || region.node.type == NodeType.g) {
+                type = RegionType.Lava;
+            }
+            region.regiontype = type;
+            region.enmeyForce = force;
+            if (region.upConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                region.tileArray[0][3] = 7;
+                region.tileArray[0][4] = 0;
+                region.tileArray[0][5] = 0;
+                region.tileArray[0][6] = 6;
+                this.setRegionType(map, x, y - 1, newtype, force + 1);
+            }
+            if (region.downConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                region.tileArray[4][3] = 4;
+                region.tileArray[4][4] = 0;
+                region.tileArray[4][5] = 0;
+                region.tileArray[4][6] = 5;
+                this.setRegionType(map, x, y + 1, newtype, force + 1);
+            }
+            if (region.leftConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                region.tileArray[2][0] = 0;
+                this.setRegionType(map, x - 1, y, newtype, force + 1);
+            }
+            if (region.rightConnect) {
+                let rnd = Math.random();
+                let newtype = type;
+                if (rnd < 0.1) {
+                    newtype = RegionType.Desert;
+                }
+                else if (rnd < 0.2) {
+                    newtype = RegionType.Grass;
+                }
+                else if (rnd < 0.3) {
+                    newtype = RegionType.Snow;
+                }
+                region.tileArray[2][9] = 0;
+                this.setRegionType(map, x + 1, y, newtype, force + 1);
+            }
+        }
+    }
+
     class GameControl extends Laya.Image {
         constructor(_player) {
             super();
@@ -55,6 +679,134 @@
                     this.player.setDirection(Math.cos(ang) * dis / 50, (Math.sin(ang) * dis / 50));
                 }
             }
+        }
+    }
+
+    class Smallthis extends Laya.Image {
+        constructor(map) {
+            super();
+            let width = map[0].length;
+            let height = map.length;
+            let gridwidth = 60;
+            let gridheight = 30;
+            let marginwidth = 10;
+            let marginheight = 5;
+            this.width = gridwidth * width;
+            this.height = 20 * height;
+            for (let j = 0; j < height; j++) {
+                for (let i = 0; i < width; i++) {
+                    if (map[j][i] == null) {
+                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, "#0000ff", "#0000ff");
+                    }
+                    else {
+                        let tmpmap = map[j][i];
+                        let groundcolor = "#00ff00";
+                        let barriercolor = "#00cc00";
+                        if (tmpmap.regiontype == RegionType.Snow) {
+                            groundcolor = "#ffffff";
+                            barriercolor = "#cccccc";
+                        }
+                        else if (tmpmap.regiontype == RegionType.Desert) {
+                            groundcolor = "#ffff00";
+                            barriercolor = "#cccc00";
+                        }
+                        else if (tmpmap.regiontype == RegionType.Lava) {
+                            groundcolor = "#9f8f8f";
+                            barriercolor = "#0c0c0c";
+                        }
+                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, groundcolor, groundcolor);
+                        if (tmpmap.upConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.downConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), gridwidth, marginheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.leftConnect) {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.rightConnect) {
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                        }
+                        else {
+                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                        }
+                        if (tmpmap.node.type == NodeType.e) {
+                            this.graphics.fillText("🦸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.b) {
+                            this.graphics.fillText("👹", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.g) {
+                            this.graphics.fillText("👸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.k) {
+                            this.graphics.fillText("🔑" + tmpmap.node.keyTo[0], i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                        if (tmpmap.node.type == NodeType.l) {
+                            this.graphics.fillText("🔒" + tmpmap.node.index, i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    class BulletFactory {
+        constructor(battlesprite) {
+            BulletFactory.mainsp = battlesprite;
+        }
+        static initBullet(BulletScript, x, y, dirx, diry) {
+            let bl = Laya.Pool.getItemByClass('BulletType', Laya.Image);
+            bl.skin = BulletScript.skin;
+            let rot = 0;
+            if (dirx == 0) {
+                if (diry > 0) {
+                    rot = 90;
+                }
+                else {
+                    rot = 270;
+                }
+            }
+            else {
+                rot = Math.atan2(diry, dirx) * 180 / 3.1415926;
+            }
+            bl.rotation = rot;
+            bl.x = x + 24 - BulletScript.width / 2;
+            bl.y = y + 24 - BulletScript.height / 2;
+            BulletFactory.mainsp.addChild(bl);
+            bl.scale(BulletScript.scale, BulletScript.scale);
+            let rigid = bl.getComponent(Laya.RigidBody);
+            if (!rigid) {
+                rigid = bl.addComponent(Laya.RigidBody);
+            }
+            rigid.type = "dynamic";
+            rigid.gravityScale = 0;
+            rigid.setVelocity({ x: dirx * BulletScript.speed, y: diry * BulletScript.speed });
+            let collider = bl.getComponent(Laya.BoxCollider);
+            if (!collider) {
+                collider = bl.addComponent(Laya.BoxCollider);
+            }
+            collider.width = BulletScript.width;
+            collider.height = BulletScript.height;
+            collider.isSensor = true;
+            let bs = bl.getComponent(Laya.Script);
+            if (!bs) {
+                bs = bl.addComponent(BulletScript);
+            }
+            bs = new BulletScript();
         }
     }
 
@@ -148,25 +900,19 @@
                 this.y /= mod;
             }
         }
+        onUpdate() {
+            if (this.HP <= 0) {
+                this.owner.x = -100;
+                this.owner.y = -100;
+                this.removeOwner(this.owner);
+            }
+        }
+        removeOwner(owner) {
+            Laya.Pool.recover('EnemyType', owner);
+            BulletFactory.mainsp.removeChild(owner);
+        }
     }
     Character.Values = [["一", "八", "匕", "厂"], ["刀", "儿", "二", "几"], ["力", "人", "入", "十"], ["又", "川", "寸", "大"], ["飞", "干", "工", "弓"], ["广", "己", "口", "马"], ["门", "女", "山", "尸"]];
-
-    var Direction;
-    (function (Direction) {
-        Direction[Direction["None"] = 0] = "None";
-        Direction[Direction["UP"] = 1] = "UP";
-        Direction[Direction["Down"] = 2] = "Down";
-        Direction[Direction["Left"] = 3] = "Left";
-        Direction[Direction["Right"] = 4] = "Right";
-    })(Direction || (Direction = {}));
-    var RegionType;
-    (function (RegionType) {
-        RegionType[RegionType["Undefined"] = 0] = "Undefined";
-        RegionType[RegionType["Grass"] = 1] = "Grass";
-        RegionType[RegionType["Desert"] = 2] = "Desert";
-        RegionType[RegionType["Snow"] = 3] = "Snow";
-        RegionType[RegionType["Lava"] = 4] = "Lava";
-    })(RegionType || (RegionType = {}));
 
     class GrassEnemy1 extends Character {
         constructor() {
@@ -186,6 +932,7 @@
             this.rigidbody = this.owner.getComponent(Laya.RigidBody);
         }
         onUpdate() {
+            super.onUpdate();
             this.AI();
         }
         AI() {
@@ -216,7 +963,7 @@
     class EnemyFactory {
         constructor(battlesprite) {
             this.grassEnemies = [GrassEnemy1];
-            this.mainsp = battlesprite;
+            EnemyFactory.mainsp = battlesprite;
             EnemyFactory.enemylist = [];
         }
         initEnemy(regiontype, enemyforce) {
@@ -229,74 +976,42 @@
                 if (Enemy.BattlePoint > enemyforce) {
                     continue;
                 }
-                let fc = new Laya.FontClip(Enemy.skinname, "一八匕厂 刀儿二几 力人入十 又川寸大");
+                let fc = Laya.Pool.getItemByClass('EnemyType', Laya.FontClip);
+                fc.skin = Enemy.skinname;
+                fc.sheet = "一八匕厂 刀儿二几 力人入十 又川寸大";
                 fc.scaleX = fc.scaleY = 3;
                 fc.value = "一";
                 fc.x = 96 + Math.random() * 96 * 8;
                 fc.y = 96 + Math.random() * 96 * 3;
-                let rigid = fc.addComponent(Laya.RigidBody);
+                let rigid = fc.getComponent(Laya.RigidBody);
+                if (!rigid) {
+                    rigid = fc.addComponent(Laya.RigidBody);
+                }
                 rigid.type = "dynamic";
                 rigid.gravityScale = 0;
                 rigid.allowRotation = false;
-                let collider = fc.addComponent(Laya.BoxCollider);
+                let collider = fc.getComponent(Laya.BoxCollider);
+                if (!collider) {
+                    collider = fc.addComponent(Laya.BoxCollider);
+                }
                 collider.width = collider.height = 16;
-                let enemy = fc.addComponent(Enemy);
+                let enemy = fc.getComponent(Laya.Script);
+                if (enemy) {
+                    fc._destroyComponent(enemy);
+                }
+                enemy = fc.addComponent(Enemy);
                 enemy.HP = enemy.maxHP;
                 EnemyFactory.enemylist.push(fc);
-                this.mainsp.addChild(fc);
+                EnemyFactory.mainsp.addChild(fc);
                 enemyforce -= Enemy.BattlePoint;
             }
         }
-        clearEnemey() {
+        static clearEnemey() {
             for (let i = 0; i < EnemyFactory.enemylist.length; i++) {
+                Laya.Pool.recover('EnemyType', EnemyFactory.enemylist[i]);
                 this.mainsp.removeChild(EnemyFactory.enemylist[i]);
-                EnemyFactory.enemylist[i].destroy();
             }
             EnemyFactory.enemylist = [];
-        }
-    }
-
-    class BulletFactory {
-        constructor(battlesprite) {
-            BulletFactory.mainsp = battlesprite;
-            BulletFactory.bulletlist = [];
-        }
-        static initBullet(BulletScript, x, y, dirx, diry) {
-            let bl = new Laya.Image(BulletScript.skin);
-            let rot = 0;
-            if (dirx == 0) {
-                if (diry > 0) {
-                    rot = 90;
-                }
-                else {
-                    rot = 270;
-                }
-            }
-            else {
-                rot = Math.atan2(diry, dirx) * 180 / 3.1415926;
-            }
-            bl.rotation = rot;
-            bl.x = x + 24 - BulletScript.width / 2;
-            bl.y = y + 24 - BulletScript.height / 2;
-            BulletFactory.bulletlist.push(bl);
-            BulletFactory.mainsp.addChild(bl);
-            bl.scale(BulletScript.scale, BulletScript.scale);
-            let rigid = bl.addComponent(Laya.RigidBody);
-            rigid.type = "dynamic";
-            rigid.gravityScale = 0;
-            rigid.setVelocity({ x: dirx * BulletScript.speed, y: diry * BulletScript.speed });
-            let collider = bl.addComponent(Laya.BoxCollider);
-            collider.width = BulletScript.width;
-            collider.height = BulletScript.height;
-            collider.isSensor = true;
-            let bs = bl.addComponent(BulletScript);
-        }
-        static clearBullet() {
-            for (let i = 0; i < BulletFactory.bulletlist.length; i++) {
-                BulletFactory.mainsp.removeChild(BulletFactory.bulletlist[i]);
-                BulletFactory.bulletlist[i].destroy();
-            }
-            BulletFactory.bulletlist = [];
         }
     }
 
@@ -305,16 +1020,29 @@
             super(...arguments);
             this.damage = 1;
         }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
         onTriggerEnter(other) {
             let player = other.owner.getComponent(Player);
             if (player) {
                 console.log(true);
             }
             else {
+                let character = other.owner.getComponent(Character);
+                if (character) {
+                    character.HP -= this.damage;
+                }
                 let owner = this.owner;
-                BulletFactory.mainsp.removeChild(owner);
-                this.enabled = false;
+                this.removeOwner(owner);
             }
+        }
+        removeOwner(owner) {
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
         }
     }
     PlayerArrow.skin = "Bullet/arrow.png";
@@ -332,14 +1060,19 @@
             this.attackAft = 5;
         }
         onUpdate() {
-            if (this.x == 0 && this.y == 0 && EnemyFactory.enemylist.length > 0) {
+            super.onUpdate();
+            if (this.x == 0 && this.y == 0) {
                 this.attacktick++;
                 if (this.action != CharacterAction.Attack) {
                     this.action = CharacterAction.Attack;
                     this.attacktick = 0;
                 }
                 if (this.attacktick < this.attackInterval) {
-                    this.onAttackWait();
+                    let res = this.onAttackWait();
+                    if (!res) {
+                        EnemyFactory.clearEnemey();
+                        this.attacktick--;
+                    }
                 }
                 else if (this.attacktick < this.attackInterval + this.attackPre) {
                     this.onAttackPre();
@@ -361,6 +1094,7 @@
             this.doMove();
         }
         onAttackWait() {
+            let index = -1;
             let enemyx = -1;
             let enemyy = -1;
             let mindist = 999999;
@@ -373,11 +1107,15 @@
                     let dely = enemy.y - owner.y;
                     let newdist = Math.sqrt(delx * delx + dely * dely);
                     if (newdist < mindist) {
+                        index = i;
                         enemyx = enemy.x;
                         enemyy = enemy.y;
                         mindist = newdist;
                     }
                 }
+            }
+            if (index == -1) {
+                return false;
             }
             let dirx = enemyx - owner.x;
             let diry = enemyy - owner.y;
@@ -385,6 +1123,7 @@
             this.dirx = dirx / mod;
             this.diry = diry / mod;
             this.doTurnAround();
+            return true;
         }
         onAttackPre() {
             this.owner.value = Character.Values[4][this.directindex];
@@ -398,21 +1137,14 @@
         }
     }
 
-    class BattleMaps {
-    }
-    BattleMaps.bm1 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [3, 0, 0, 0, 3, 0, 0, 0, 0, 3],
-        [3, 0, 3, 0, 0, 0, 0, 3, 0, 3],
-        [3, 0, 0, 0, 0, 3, 0, 0, 0, 3],
-        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-    ];
-
     class BattleImage {
         constructor(battlesprite) {
             this.mainsp = battlesprite;
             this.tilePool = [];
-            this.enemyFactory = new EnemyFactory(battlesprite);
-            this.bulletFactory = new BulletFactory(battlesprite);
+        }
+        initMap(regiontype, battlemap, enemyforce) {
+            this.enemyFactory = new EnemyFactory(this.mainsp);
+            this.bulletFactory = new BulletFactory(this.mainsp);
             for (let j = 0; j < 5; j++) {
                 let tmppool = [];
                 for (let i = 0; i < 10; i++) {
@@ -428,8 +1160,6 @@
                 }
                 this.tilePool.push(tmppool);
             }
-        }
-        initMap(regiontype, battlemap, enemyforce) {
             BattleMaps.currentBattleMap = battlemap;
             for (let j = 0; j < 5; j++) {
                 for (let i = 0; i < 10; i++) {
@@ -447,20 +1177,41 @@
             this.enemyFactory.initEnemy(regiontype, enemyforce);
         }
     }
-    BattleImage.grasstilename = ["", "匕", "八", "一"];
+    BattleImage.grasstilename = ["", "一", "八", "匕", "厂", "刀", "儿", "二"];
 
     class BattleScene extends Laya.Scene {
+        constructor(regionmap) {
+            super();
+            this.battleindex = 0;
+            this.tmpMapX = 0;
+            this.tmpMapY = 0;
+            this.regionmap = regionmap;
+            for (let j = 0; j < regionmap.length; j++) {
+                for (let i = 0; i < regionmap[0].length; i++) {
+                    if (regionmap[j][i] && regionmap[j][i].node.type == NodeType.e) {
+                        this.tmpMapX = i;
+                        this.tmpMapY = j;
+                    }
+                }
+            }
+        }
         createChildren() {
             super.createChildren();
             this.loadScene("BattleScene");
         }
         onAwake() {
-            this.battleimagedeal = new BattleImage(this.battlesprite);
-            this.battleimagedeal.initMap(RegionType.Grass, BattleMaps.bm1, 2);
+            this.battleimagedeal = [];
+            this.battleimagedeal.push(new BattleImage(this.battlesprite1));
+            this.battleimagedeal.push(new BattleImage(this.battlesprite2));
+            let tmpregion = this.regionmap[this.tmpMapY][this.tmpMapX];
+            this.battleimagedeal[this.battleindex].initMap(tmpregion.regiontype, tmpregion.tileArray, 2);
+            this.battleimagedeal[this.battleindex].mainsp.visible = true;
+            this.battleimagedeal[1 - this.battleindex].mainsp.visible = false;
             let playercontroller = this.player.getComponent(Player);
             playercontroller.HP = playercontroller.maxHP = 15;
+            let MapImage = new Smallthis(this.regionmap);
+            this.addChild(MapImage);
             this.controller = new GameControl(playercontroller);
-            console.log(this.player);
             this.addChild(this.controller);
         }
     }
@@ -485,7 +1236,7 @@
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;
     GameConfig.stat = false;
-    GameConfig.physicsDebug = true;
+    GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
 
@@ -514,7 +1265,11 @@
             Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));
         }
         onConfigLoaded() {
-            let bs = new BattleScene();
+            let map = Map.generateWorld();
+            while (map.length == 0) {
+                map = Map.generateWorld();
+            }
+            let bs = new BattleScene(map);
             Laya.stage.addChild(bs);
         }
         onMapLoaded() {

@@ -1,0 +1,12 @@
+{
+  "code": "import { GameControl } from \"./GameControl\";\r\nimport SmallMapImage from \"../graphic/SmallMapImage\";\r\nimport Player from \"../character/Player\";\r\nimport BattleImage from \"../map/BattleImage\";\r\nimport { NodeType } from \"../script/Node\";\r\nexport default class BattleScene extends Laya.Scene {\r\n    constructor(regionmap) {\r\n        super();\r\n        this.battleindex = 0;\r\n        this.tmpMapX = 0;\r\n        this.tmpMapY = 0;\r\n        this.regionmap = regionmap;\r\n        for (let j = 0; j < regionmap.length; j++) {\r\n            for (let i = 0; i < regionmap[0].length; i++) {\r\n                if (regionmap[j][i] && regionmap[j][i].node.type == NodeType.e) {\r\n                    this.tmpMapX = i;\r\n                    this.tmpMapY = j;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    createChildren() {\r\n        super.createChildren();\r\n        this.loadScene(\"BattleScene\");\r\n    }\r\n    onAwake() {\r\n        this.battleimagedeal = [];\r\n        this.battleimagedeal.push(new BattleImage(this.battlesprite1));\r\n        this.battleimagedeal.push(new BattleImage(this.battlesprite2));\r\n        let tmpregion = this.regionmap[this.tmpMapY][this.tmpMapX];\r\n        this.battleimagedeal[this.battleindex].initMap(tmpregion.regiontype, tmpregion.tileArray, 2);\r\n        this.battleimagedeal[this.battleindex].mainsp.visible = true;\r\n        this.battleimagedeal[1 - this.battleindex].mainsp.visible = false;\r\n        let playercontroller = this.player.getComponent(Player);\r\n        playercontroller.HP = playercontroller.maxHP = 15;\r\n        let MapImage = new SmallMapImage(this.regionmap);\r\n        this.addChild(MapImage);\r\n        this.controller = new GameControl(playercontroller);\r\n        this.addChild(this.controller);\r\n    }\r\n}\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/GameControl.ts",
+    "/Users/huanggaole/PCGZelda/src/graphic/SmallMapImage.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts",
+    "/Users/huanggaole/PCGZelda/src/map/BattleImage.ts",
+    "/Users/huanggaole/PCGZelda/src/script/Region.ts",
+    "/Users/huanggaole/PCGZelda/src/map/BattleMaps.ts",
+    "/Users/huanggaole/PCGZelda/src/script/Node.ts"
+  ]
+}

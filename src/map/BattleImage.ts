@@ -8,12 +8,16 @@ export default class BattleImage{
     enemyFactory:EnemyFactory;
     bulletFactory:BulletFactory;
     mainsp:Laya.Sprite;
-    static grasstilename = ["","匕","八","一"];
+    static grasstilename = ["","一","八","匕","厂","刀","儿","二"];
     constructor(battlesprite:Laya.Sprite){
         this.mainsp = battlesprite;
         this.tilePool = [];
-        this.enemyFactory = new EnemyFactory(battlesprite);
-        this.bulletFactory = new BulletFactory(battlesprite);
+        
+    }
+
+    initMap(regiontype:RegionType,battlemap:number[][],enemyforce:number){
+        this.enemyFactory = new EnemyFactory(this.mainsp);
+        this.bulletFactory = new BulletFactory(this.mainsp);
         for(let j = 0; j < 5; j++){
             let tmppool = [];
             for(let i = 0; i < 10; i++){
@@ -32,9 +36,6 @@ export default class BattleImage{
             }
             this.tilePool.push(tmppool);
         }
-    }
-
-    initMap(regiontype:RegionType,battlemap:number[][],enemyforce:number){
         BattleMaps.currentBattleMap = battlemap;
         // 将图块添加到地图上
         for(let j = 0; j < 5; j++){
