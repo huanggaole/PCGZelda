@@ -1,4 +1,4 @@
-import { RegionType } from "../script/Region";
+import Region, { RegionType } from "../script/Region";
 import BattleMaps from "./BattleMaps";
 import EnemyFactory from "./EnemyFactory";
 import BulletFactory from "./BulletFactory";
@@ -16,6 +16,11 @@ export default class BattleImage{
     
     ifcanMove = true;
     static grasstilename = ["","一","八","匕","厂","刀","儿","二"];
+    static sandtilename = ["","入","十","又","川","寸","大","飞"];
+    static deserttilename = ["","广","己","口","马","门","女","山"];
+    static snowtilename = ["","土","兀","夕","小","子","贝","比"];
+    static lavatilename = ["","斗","厄","方","风","父","戈","户"];
+    
     constructor(battlesprite:Laya.Sprite){
         this.mainsp = battlesprite;
         this.tilePool = [];
@@ -81,7 +86,23 @@ export default class BattleImage{
                     this.mainsp.removeChild(this.tilePool[j][i]);
                 }else{
                     if(regiontype == RegionType.Grass){
+                        this.mainsp.loadImage("Battle/GrassLand.png");
                         this.tilePool[j][i].value = BattleImage.grasstilename[battlemap[j][i]];
+                        this.mainsp.addChild(this.tilePool[j][i]);
+                    }
+                    if(regiontype == RegionType.Desert){
+                        this.mainsp.loadImage("Battle/SandLand.png");                        
+                        this.tilePool[j][i].value = BattleImage.deserttilename[battlemap[j][i]];
+                        this.mainsp.addChild(this.tilePool[j][i]);
+                    }
+                    if(regiontype == RegionType.Lava){
+                        this.mainsp.loadImage("Battle/LavaLand.png");                        
+                        this.tilePool[j][i].value = BattleImage.lavatilename[battlemap[j][i]];
+                        this.mainsp.addChild(this.tilePool[j][i]);
+                    }
+                    if(regiontype == RegionType.Snow){
+                        this.mainsp.loadImage("Battle/SnowLand.png");                        
+                        this.tilePool[j][i].value = BattleImage.snowtilename[battlemap[j][i]];
                         this.mainsp.addChild(this.tilePool[j][i]);
                     }
                 }

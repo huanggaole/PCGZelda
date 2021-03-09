@@ -629,12 +629,13 @@
         constructor(_player) {
             super();
             this.player = _player;
-            this.width = Laya.Browser.width;
-            this.height = Laya.Browser.height;
+            this.width = 960;
+            this.height = 480;
+            this.y = 80;
             this.dirR = new Laya.Sprite();
             this.proR = new Laya.Sprite();
-            this.proR.graphics.drawCircle(0, 0, 5, "#FFFFFF");
-            this.proR.graphics.drawCircle(0, 0, 75, "#878787");
+            this.proR.graphics.drawCircle(0, -80, 5, "#FFFFFF");
+            this.proR.graphics.drawCircle(0, -80, 75, "#878787");
             this.dirR.visible = false;
             this.proR.visible = false;
             this.proR.zOrder = 1001;
@@ -648,7 +649,7 @@
         onMouseDown() {
             this.dirR.pos(Laya.stage.mouseX, Laya.stage.mouseY);
             this.dirR.alpha = 0.6;
-            this.dirR.graphics.drawCircle(0, 0, 25, "#A9AAAB");
+            this.dirR.graphics.drawCircle(0, -80, 25, "#A9AAAB");
             this.proR.pos(Laya.stage.mouseX, Laya.stage.mouseY);
             this.proR.alpha = 0.5;
             this.dirR.visible = true;
@@ -685,6 +686,7 @@
     class Smallthis extends Laya.Image {
         constructor(map) {
             super();
+            this.map = map;
             let width = map[0].length;
             let height = map.length;
             let gridwidth = 60;
@@ -975,9 +977,150 @@
     GrassEnemy1.BattlePoint = 1;
     GrassEnemy1.skinname = "Enemy/3.png";
 
+    class SandEnemy1 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 2;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 1.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 200) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+    }
+    SandEnemy1.BattlePoint = 1;
+    SandEnemy1.skinname = "Enemy/2.png";
+
+    class SnowEnemy1 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 1;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 3.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 200) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+    }
+    SnowEnemy1.BattlePoint = 1;
+    SnowEnemy1.skinname = "Enemy/7.png";
+
+    class LavaEnemy1 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 2;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 2.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 200) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+    }
+    LavaEnemy1.BattlePoint = 1;
+    LavaEnemy1.skinname = "Enemy/19.png";
+
     class EnemyFactory {
         constructor(battlesprite) {
             this.grassEnemies = [GrassEnemy1];
+            this.sandEnemies = [SandEnemy1];
+            this.snowEnemies = [SnowEnemy1];
+            this.lavaEnemies = [LavaEnemy1];
             EnemyFactory.mainsp = battlesprite;
             EnemyFactory.enemylist = [];
         }
@@ -985,6 +1128,15 @@
             let Enemies = [];
             if (regiontype == RegionType.Grass) {
                 Enemies = this.grassEnemies;
+            }
+            if (regiontype == RegionType.Desert) {
+                Enemies = this.sandEnemies;
+            }
+            if (regiontype == RegionType.Snow) {
+                Enemies = this.snowEnemies;
+            }
+            if (regiontype == RegionType.Lava) {
+                Enemies = this.lavaEnemies;
             }
             while (enemyforce > 0) {
                 let Enemy = Enemies[Math.floor(Math.random() * Enemies.length)];
@@ -1291,7 +1443,23 @@
                     }
                     else {
                         if (regiontype == RegionType.Grass) {
+                            this.mainsp.loadImage("Battle/GrassLand.png");
                             this.tilePool[j][i].value = BattleImage.grasstilename[battlemap[j][i]];
+                            this.mainsp.addChild(this.tilePool[j][i]);
+                        }
+                        if (regiontype == RegionType.Desert) {
+                            this.mainsp.loadImage("Battle/SandLand.png");
+                            this.tilePool[j][i].value = BattleImage.deserttilename[battlemap[j][i]];
+                            this.mainsp.addChild(this.tilePool[j][i]);
+                        }
+                        if (regiontype == RegionType.Lava) {
+                            this.mainsp.loadImage("Battle/LavaLand.png");
+                            this.tilePool[j][i].value = BattleImage.lavatilename[battlemap[j][i]];
+                            this.mainsp.addChild(this.tilePool[j][i]);
+                        }
+                        if (regiontype == RegionType.Snow) {
+                            this.mainsp.loadImage("Battle/SnowLand.png");
+                            this.tilePool[j][i].value = BattleImage.snowtilename[battlemap[j][i]];
                             this.mainsp.addChild(this.tilePool[j][i]);
                         }
                     }
@@ -1323,6 +1491,10 @@
         }
     }
     BattleImage.grasstilename = ["", "一", "八", "匕", "厂", "刀", "儿", "二"];
+    BattleImage.sandtilename = ["", "入", "十", "又", "川", "寸", "大", "飞"];
+    BattleImage.deserttilename = ["", "广", "己", "口", "马", "门", "女", "山"];
+    BattleImage.snowtilename = ["", "土", "兀", "夕", "小", "子", "贝", "比"];
+    BattleImage.lavatilename = ["", "斗", "厄", "方", "风", "父", "戈", "户"];
 
     class BattleScene extends Laya.Scene {
         constructor(regionmap) {
@@ -1353,7 +1525,11 @@
             playercontroller.HP = playercontroller.maxHP = 15;
             BattleScene.player = this.player;
             let MapImage = new Smallthis(BattleScene.regionmap);
+            MapImage.visible = false;
             this.addChild(MapImage);
+            MapImage.centerX = 0;
+            MapImage.centerY = 0;
+            this.map_button.on(Laya.Event.CLICK, this, () => { MapImage.visible = !MapImage.visible; console.log("map"); });
             this.controller = new GameControl(playercontroller);
             this.addChild(this.controller);
         }
@@ -1387,6 +1563,9 @@
             reg("character/Character.ts", Character);
             reg("character/Player.ts", Player);
             reg("character/GrassEnemy1.ts", GrassEnemy1);
+            reg("character/SnowEnemy1.ts", SnowEnemy1);
+            reg("character/SandEnemy1.ts", SandEnemy1);
+            reg("character/LavaEnemy1.ts", LavaEnemy1);
             reg("events/toUp.ts", toUp);
             reg("events/toDown.ts", toDown);
             reg("events/toLeft.ts", toLeft);
@@ -1403,7 +1582,7 @@
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;
     GameConfig.stat = false;
-    GameConfig.physicsDebug = true;
+    GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
 

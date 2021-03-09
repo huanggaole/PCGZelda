@@ -1,12 +1,12 @@
 {
     "x":0,
     "type":"Scene",
-    "selectedBox":59,
-    "selecteID":64,
+    "selectedBox":2,
+    "selecteID":84,
     "searchKey":"Scene",
     "props":{"width":960,"sceneColor":"#000000","height":640},
     "nodeParent":-1,
-    "maxID":84,
+    "maxID":85,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -21,14 +21,13 @@
             "props":{"y":80,"x":0,"var":"battlesprite1","texture":"Battle/GrassLand.png"},
             "nodeParent":2,
             "label":"battlesprite1",
-            "isOpen":true,
+            "isOpen":false,
             "isDirectory":true,
             "isAniNode":true,
             "hasChild":true,
             "compId":42,
             "child":[
                 {
-                    "x":30,
                     "type":"FontClip",
                     "searchKey":"FontClip,player",
                     "props":{"y":224,"x":464,"var":"player","value":"匕","skin":"Player/15.png","sheet":"一八匕厂 刀儿二几 力人入十 又川寸大 飞干工弓 广己口马 门女山尸","scaleY":3,"scaleX":3},
@@ -88,7 +87,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,downCollider",
                     "props":{"y":480,"x":0,"width":960,"var":"downCollider","height":96},
@@ -101,7 +99,6 @@
                     "compId":47,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -117,7 +114,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -133,7 +129,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "switchAble":true,
                             "source":"src/events/toDown.ts",
@@ -151,7 +146,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,upCollider",
                     "props":{"y":-96,"x":0,"width":960,"var":"upCollider","height":96},
@@ -164,7 +158,6 @@
                     "compId":50,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -180,7 +173,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -196,7 +188,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "source":"src/events/toUp.ts",
                             "searchKey":"Script,toUp",
@@ -212,7 +203,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,leftCollider",
                     "props":{"y":0,"x":-96,"width":96,"var":"leftCollider","height":480},
@@ -225,7 +215,6 @@
                     "compId":53,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -241,7 +230,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -257,7 +245,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "source":"src/events/toLeft.ts",
                             "searchKey":"Script,toLeft",
@@ -273,7 +260,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,rightCollider",
                     "props":{"y":0,"x":960,"width":96,"var":"rightCollider","height":480},
@@ -286,7 +272,6 @@
                     "compId":56,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -302,7 +287,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -318,7 +302,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "source":"src/events/toRight.ts",
                             "searchKey":"Script,toRight",
@@ -341,14 +324,13 @@
             "props":{"y":80,"x":-2000,"var":"battlesprite2","texture":"Battle/GrassLand.png"},
             "nodeParent":2,
             "label":"battlesprite2",
-            "isOpen":true,
+            "isOpen":false,
             "isDirectory":true,
             "isAniNode":true,
             "hasChild":true,
             "compId":59,
             "child":[
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,toDown",
                     "props":{"y":480,"x":0,"width":960,"var":"toDown","height":96},
@@ -361,7 +343,6 @@
                     "compId":64,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -377,7 +358,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -393,7 +373,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "switchAble":true,
                             "source":"src/events/toDown.ts",
@@ -411,7 +390,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,toUp",
                     "props":{"y":-96,"x":0,"width":960,"var":"toUp","height":96},
@@ -424,7 +402,6 @@
                     "compId":67,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -440,7 +417,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -456,7 +432,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "source":"src/events/toUp.ts",
                             "searchKey":"Script,toUp",
@@ -472,7 +447,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,toLeft",
                     "props":{"y":0,"x":-96,"width":96,"var":"toLeft","height":480},
@@ -485,7 +459,6 @@
                     "compId":70,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -501,7 +474,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -517,7 +489,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "source":"src/events/toLeft.ts",
                             "searchKey":"Script,toLeft",
@@ -533,7 +504,6 @@
                         }]
                 },
                 {
-                    "x":30,
                     "type":"Sprite",
                     "searchKey":"Sprite,toRight",
                     "props":{"y":0,"x":960,"width":96,"var":"toRight","height":480},
@@ -546,7 +516,6 @@
                     "compId":73,
                     "child":[
                         {
-                            "x":45,
                             "type":"BoxCollider",
                             "switchAble":true,
                             "searchKey":"BoxCollider",
@@ -562,7 +531,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"RigidBody",
                             "switchAble":true,
                             "searchKey":"RigidBody",
@@ -578,7 +546,6 @@
                                 ]
                         },
                         {
-                            "x":45,
                             "type":"Script",
                             "switchAble":true,
                             "source":"src/events/toRight.ts",
@@ -595,6 +562,20 @@
                                 ]
                         }]
                 }]
+        },
+        {
+            "x":15,
+            "type":"Button",
+            "searchKey":"Button,map_button",
+            "props":{"y":568,"x":454,"var":"map_button","stateNum":"1","skin":"comp/map-button.png","scaleY":3,"scaleX":3},
+            "nodeParent":2,
+            "label":"map_button",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":84,
+            "child":[
+                ]
         }],
     "animations":[
         {

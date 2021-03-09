@@ -11,6 +11,7 @@ export default class BattleScene extends Laya.Scene{
 
     controller:GameControl;
     player:Laya.FontClip;
+    map_button:Laya.Button;
 
     static player;
     static battleimagedeal:BattleImage[];
@@ -54,10 +55,14 @@ export default class BattleScene extends Laya.Scene{
         BattleScene.player = this.player;
 
         let MapImage = new SmallMapImage(BattleScene.regionmap);
-		this.addChild(MapImage);
+        MapImage.visible = false;
+        this.addChild(MapImage);
+        MapImage.centerX = 0;
+        MapImage.centerY = 0;
+        this.map_button.on(Laya.Event.CLICK, this, ()=>{MapImage.visible = !MapImage.visible;console.log("map");});
 
         this.controller = new GameControl(playercontroller);
-        this.addChild(this.controller);
+        this.addChild(this.controller);       
     }
 
     static switchMap(delx:number, dely:number){

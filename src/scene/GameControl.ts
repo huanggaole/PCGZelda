@@ -11,12 +11,13 @@ export class GameControl extends Laya.Image{
     constructor(_player:Player){
         super();
         this.player = _player;
-        this.width = Laya.Browser.width;
-        this.height = Laya.Browser.height;
+        this.width = 960;
+        this.height = 480;
+        this.y = 80;
         this.dirR = new Laya.Sprite();
         this.proR = new Laya.Sprite();
-        this.proR.graphics.drawCircle(0, 0, 5, "#FFFFFF");
-        this.proR.graphics.drawCircle(0, 0, 75, "#878787");
+        this.proR.graphics.drawCircle(0, -80, 5, "#FFFFFF");
+        this.proR.graphics.drawCircle(0, -80, 75, "#878787");
         this.dirR.visible = false;
         this.proR.visible = false;
         this.proR.zOrder = 1001;
@@ -31,7 +32,7 @@ export class GameControl extends Laya.Image{
     public onMouseDown() {
         this.dirR.pos(Laya.stage.mouseX, Laya.stage.mouseY);
         this.dirR.alpha = 0.6;
-        this.dirR.graphics.drawCircle(0, 0, 25, "#A9AAAB");
+        this.dirR.graphics.drawCircle(0, -80, 25, "#A9AAAB");
         this.proR.pos(Laya.stage.mouseX, Laya.stage.mouseY);
         this.proR.alpha = 0.5;
         this.dirR.visible = true;

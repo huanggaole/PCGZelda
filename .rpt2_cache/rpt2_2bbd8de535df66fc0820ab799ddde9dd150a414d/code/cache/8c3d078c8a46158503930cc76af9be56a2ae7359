@@ -1,0 +1,16 @@
+{
+  "code": "import BattleScene from \"./scene/BattleScene\";\r\nimport Character from \"./character/Character\";\r\nimport Player from \"./character/Player\";\r\nimport GrassEnemy1 from \"./character/GrassEnemy1\";\r\nimport toUp from \"./events/toUp\";\r\nimport toDown from \"./events/toDown\";\r\nimport toLeft from \"./events/toLeft\";\r\nimport toRight from \"./events/toRight\";\r\nimport SnowEnemy1 from \"./character/SnowEnemy1\";\r\nimport SandEnemy1 from \"./character/SandEnemy1\";\r\nimport LavaEnemy1 from \"./character/LavaEnemy1\";\r\nexport default class GameConfig {\r\n    constructor() { }\r\n    static init() {\r\n        var reg = Laya.ClassUtils.regClass;\r\n        reg(\"scene/BattleScene.ts\", BattleScene);\r\n        reg(\"character/Character.ts\", Character);\r\n        reg(\"character/Player.ts\", Player);\r\n        reg(\"character/GrassEnemy1.ts\", GrassEnemy1);\r\n        reg(\"character/SnowEnemy1.ts\", SnowEnemy1);\r\n        reg(\"character/SandEnemy1.ts\", SandEnemy1);\r\n        reg(\"character/LavaEnemy1.ts\", LavaEnemy1);\r\n        reg(\"events/toUp.ts\", toUp);\r\n        reg(\"events/toDown.ts\", toDown);\r\n        reg(\"events/toLeft.ts\", toLeft);\r\n        reg(\"events/toRight.ts\", toRight);\r\n    }\r\n}\r\nGameConfig.width = 960;\r\nGameConfig.height = 640;\r\nGameConfig.scaleMode = \"showall\";\r\nGameConfig.screenMode = \"none\";\r\nGameConfig.alignV = \"top\";\r\nGameConfig.alignH = \"left\";\r\nGameConfig.startScene = \"test/TestScene.scene\";\r\nGameConfig.sceneRoot = \"\";\r\nGameConfig.debug = false;\r\nGameConfig.stat = false;\r\nGameConfig.physicsDebug = false;\r\nGameConfig.exportSceneToJson = true;\r\nGameConfig.init();\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/BattleScene.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Character.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts",
+    "/Users/huanggaole/PCGZelda/src/character/GrassEnemy1.ts",
+    "/Users/huanggaole/PCGZelda/src/events/toUp.ts",
+    "/Users/huanggaole/PCGZelda/src/events/toDown.ts",
+    "/Users/huanggaole/PCGZelda/src/events/toLeft.ts",
+    "/Users/huanggaole/PCGZelda/src/events/toRight.ts",
+    "/Users/huanggaole/PCGZelda/src/character/SnowEnemy1.ts",
+    "/Users/huanggaole/PCGZelda/src/character/SandEnemy1.ts",
+    "/Users/huanggaole/PCGZelda/src/character/LavaEnemy1.ts"
+  ]
+}

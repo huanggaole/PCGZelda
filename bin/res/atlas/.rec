@@ -2,7 +2,7 @@ D .
 D Battle
 R F9A38A5D GrassLand.png
 R 29E2F76B LavaLand.png
-R B0EFAB9B map1.png
+R D10FDA9D map1.png
 R 929AA6B8 SandLand.png
 R 8FC4D1F1 SnowLand.png
 D Bullet
@@ -36,6 +36,7 @@ P 2BE22124 img_bg5.png
 P BA28BD65 img_blank.png
 P BA2A0579 label.png
 P 5EDC128C linkbutton.png
+P C451CE7B map-button.png
 P B017E53E progress$bar.png
 P C05839CD progress.png
 P 3C493DD4 radio.png
@@ -49,8 +50,30 @@ P 0587871F vscroll$up.png
 P 5FD17798 vscroll.png
 P DDDDFB9E vslider$bar.png
 P 01BAE7F5 vslider.png
+P 2A0C1825 yes-button.png
 D Enemy
+P E14C9C48 1.png
+P AC27CADD 10.png
+P C88547D7 11.png
+P D3DFE975 12.png
+P 74A7FA5C 13.png
+P F4B94479 14.png
+P 6CCA3391 15.png
+P 8E63FADF 16.png
+P 84205D92 17.png
+P D14CCBE9 18.png
+P BF4A7E5A 19.png
+P 7474FFCF 2.png
+P E9DD8F4C 20.png
+P BE2D541E 21.png
+P 810CC6E3 22.png
 P E5C847CB 3.png
+P 42AF02F6 4.png
+P D420D96F 5.png
+P 5CC5D1F1 6.png
+P 3AECF814 7.png
+P 4B98DB64 8.png
+P 224AFCBF 9.png
 D Player
 P D1F7EF71 15.png
 D sound

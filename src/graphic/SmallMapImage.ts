@@ -1,8 +1,10 @@
 import Region,{RegionType} from "../script/Region";
 import {NodeType} from "../script/Node"
 export default class Smallthis extends Laya.Image{
+	map;
     constructor(map:Region[][]){
-        super();
+		super();
+		this.map = map;
         let width = map[0].length;
 		let height = map.length;
 		let gridwidth = 60;

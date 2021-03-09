@@ -1,10 +1,17 @@
 import { RegionType } from "../script/Region";
 import GrassEnemy1 from "../character/GrassEnemy1";
+import SandEnemy1 from "../character/SandEnemy1";
+import SnowEnemy1 from "../character/SnowEnemy1";
+import LavaEnemy1 from "../character/LavaEnemy1";
 
 export default class EnemyFactory{
     static mainsp:Laya.Sprite;
     static enemylist:Laya.FontClip[];
     grassEnemies = [GrassEnemy1];
+    sandEnemies = [SandEnemy1];
+    snowEnemies = [SnowEnemy1];
+    lavaEnemies = [LavaEnemy1];
+    
     constructor(battlesprite:Laya.Sprite){
         EnemyFactory.mainsp = battlesprite;
         EnemyFactory.enemylist = [];
@@ -14,6 +21,15 @@ export default class EnemyFactory{
         let Enemies = [];
         if(regiontype == RegionType.Grass){
             Enemies = this.grassEnemies;
+        }
+        if(regiontype == RegionType.Desert){
+            Enemies = this.sandEnemies;
+        }
+        if(regiontype == RegionType.Snow){
+            Enemies = this.snowEnemies;
+        }
+        if(regiontype == RegionType.Lava){
+            Enemies = this.lavaEnemies;
         }
         while(enemyforce > 0){
             let Enemy = Enemies[Math.floor(Math.random() * Enemies.length)];
