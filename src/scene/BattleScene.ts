@@ -8,6 +8,7 @@ import { NodeType } from "../script/Node";
 import EnemyFactory from "../map/EnemyFactory";
 export default class BattleScene extends Laya.Scene{
     static regionmap:Region[][];
+    static Lv;
 
     controller:GameControl;
     player:Laya.FontClip;
@@ -19,8 +20,21 @@ export default class BattleScene extends Laya.Scene{
     battlesprite1:Laya.Sprite;
     battlesprite2:Laya.Sprite;
 
+    heart1:Laya.Clip;
+    heart2:Laya.Clip;
+    heart3:Laya.Clip;
+    heart4:Laya.Clip;
+    heart5:Laya.Clip;
+    heart6:Laya.Clip;
+
+    lv:Laya.Label;
+
+    static hearts = [];
+
     static tmpMapX = 0;
     static tmpMapY = 0;
+
+    static MapImage:SmallMapImage;
 
     constructor(regionmap:Region[][]){
         super();
@@ -40,6 +54,8 @@ export default class BattleScene extends Laya.Scene{
         
     }
     onAwake(){
+        BattleScene.Lv = this.lv;
+        
         BattleScene.battleimagedeal = [];
         BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite1));
         BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite2));
@@ -51,21 +67,32 @@ export default class BattleScene extends Laya.Scene{
         BattleScene.battleimagedeal[1 - BattleScene.battleindex].mainsp.visible = false;
         // 增加游标
         let playercontroller = this.player.getComponent(Player) as Player;
-        playercontroller.HP = playercontroller.maxHP = 15;
+        
+        playercontroller.maxHP = 12;
+        playercontroller.HP = 12;
+
         BattleScene.player = this.player;
 
-        let MapImage = new SmallMapImage(BattleScene.regionmap);
-        MapImage.visible = false;
-        this.addChild(MapImage);
-        MapImage.centerX = 0;
-        MapImage.centerY = 0;
-        this.map_button.on(Laya.Event.CLICK, this, ()=>{MapImage.visible = !MapImage.visible;console.log("map");});
+        BattleScene.MapImage = new SmallMapImage(BattleScene.regionmap);
+        BattleScene.MapImage.visible = false;
+        this.addChild(BattleScene.MapImage);
+        BattleScene.MapImage.centerX = 0;
+        BattleScene.MapImage.centerY = 0;
+        this.map_button.on(Laya.Event.CLICK, BattleScene, ()=>{BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);BattleScene.MapImage.visible = !BattleScene.MapImage.visible;console.log("map");});
 
         this.controller = new GameControl(playercontroller);
+        BattleScene.hearts = [];
+        BattleScene.hearts.push(this.heart1);
+        BattleScene.hearts.push(this.heart2);
+        BattleScene.hearts.push(this.heart3);
+        BattleScene.hearts.push(this.heart4);
+        BattleScene.hearts.push(this.heart5);
+        BattleScene.hearts.push(this.heart6);
         this.addChild(this.controller);       
     }
 
     static switchMap(delx:number, dely:number){
+        BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);
         console.log(BattleScene.regionmap);
         // 加载地图
         let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];

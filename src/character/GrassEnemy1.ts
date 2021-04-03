@@ -1,9 +1,13 @@
 import Character, { CharacterAction } from "./Character"
+import Player from "./Player";
+import BattleScene from "../scene/BattleScene"
 export default class GrassEnemy1 extends Character{
     static BattlePoint = 1;
     static skinname = "Enemy/3.png";
     AItick = 0;
     maxHP = 2;
+    damage = 1;
+
     onStart(){
         this.x = 0;
         this.y = 0;
@@ -19,6 +23,12 @@ export default class GrassEnemy1 extends Character{
     onUpdate(){
         super.onUpdate();
         this.AI();
+    }
+
+    addExp(){
+        super.addExp();
+        Player.exp += 2;
+        BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
     }
 
     AI(){
@@ -44,5 +54,15 @@ export default class GrassEnemy1 extends Character{
         }
 
         this.doMove();
+    }
+
+    onTriggerEnter(other:any){
+        if(this.owner && other.owner){
+            let character = (other.owner as Laya.Node).getComponent(Player);
+            if(character && !character.invincibleStatus){
+                character.hurtFrame = 20;
+                character.HP -= this.damage;
+            }
+        }
     }
 }

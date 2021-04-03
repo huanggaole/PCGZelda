@@ -1,63 +1,41 @@
-// v1.2.0
-// publish 2.x 也是用这个文件，需要做兼容
-let isPublish2 = process.argv[2].includes("publish_wxgame.js") && process.argv[3].includes("--evn=publish2");
-// 获取Node插件和工作路径
-let ideModuleDir, workSpaceDir;
-if (isPublish2) {
-	//是否使用IDE自带的node环境和插件，设置false后，则使用自己环境(使用命令行方式执行)
-	const useIDENode = process.argv[0].indexOf("LayaAir") > -1 ? true : false;
-	ideModuleDir = useIDENode ? process.argv[1].replace("gulp\\bin\\gulp.js", "").replace("gulp/bin/gulp.js", "") : "";
-	workSpaceDir = useIDENode ? process.argv[2].replace("--gulpfile=", "").replace("\\.laya\\publish_wxgame.js", "").replace("/.laya/publish_wxgame.js", "") + "/" : "./../";
-} else {
-	ideModuleDir = global.ideModuleDir;
-	workSpaceDir = global.workSpaceDir;
-}
+// v1.8.7
+const ideModuleDir = global.ideModuleDir;
+const workSpaceDir = global.workSpaceDir;
 
 //引用插件模块
 const gulp = require(ideModuleDir + "gulp");
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
-const childProcess = require("child_process");
 const del = require(ideModuleDir + "del");
 const revCollector = require(ideModuleDir + 'gulp-rev-collector');
-let commandSuffix = ".cmd";
-const provider = "wxe24357b5ce551510";
-const fullRemoteEngineList = ["laya.core.js", "laya.webgl.js", "laya.filter.js", "laya.ani.js", "laya.d3.js", "laya.html.js", "laya.particle.js", "laya.ui.js", "bytebuffer.js"];
+const { getEngineVersion, getFileMd5, canUsePluginEngine } = require("./pub_utils");
 
-let prevTasks = ["packfile"];
-if (isPublish2) {
-	prevTasks = "";
-}
+const provider = "wx70d8aa25ec591f7a";
+const minPluginVersion = "2.0.1";
+let fullRemoteEngineList = ["laya.core.js", "laya.filter.js", "laya.ani.js", "laya.tiledmap.js", "laya.d3.js", "laya.html.js", "laya.particle.js", "laya.ui.js", "laya.webgl.js", "laya.filter.js", "laya.d3Plugin.js"];
+let copyLibsTask = ["copyPlatformLibsJsFile"];
+let versiontask = ["version2"];
 
 let 
     config,
-	platform,
     releaseDir;
-let isGlobalCli = true;
 let isOpendataProj;
 let versionCon; // 版本管理version.json
-// 应该在publish中的，但是为了方便发布2.0及IDE 1.x，放在这里修改
-gulp.task("preCreate_WX", prevTasks, function() {
-	if (isPublish2) {
-		let pubsetPath = path.join(workSpaceDir, ".laya", "pubset.json");
-		let content = fs.readFileSync(pubsetPath, "utf8");
-		let pubsetJson = JSON.parse(content);
-		platform = "wxgame";
-		releaseDir = path.join(workSpaceDir, "release", platform).replace(/\\/g, "/");
-		config = pubsetJson[1];
-	} else {
-		platform = global.platform;
-		releaseDir = global.releaseDir;
-		config = global.config;
+let commandSuffix,
+	layarepublicPath;
+
+gulp.task("preCreate_WX", copyLibsTask, function() {
+	releaseDir = global.releaseDir;
+	config = global.config;
+	commandSuffix = global.commandSuffix;
+	layarepublicPath = global.layarepublicPath;
+
+	if (config.useMinJsLibs) {
+		fullRemoteEngineList = fullRemoteEngineList.map((item, index) => {
+			return item.replace(".js", ".min.js");
+		})
 	}
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
-		return;
-	}
-	if (process.platform === "darwin") {
-		commandSuffix = "";
-	}
+
 	// 是否是开放域项目
 	let projInfoPath = path.join(workSpaceDir, path.basename(workSpaceDir) + ".laya");
 	let isExist = fs.existsSync(projInfoPath);
@@ -68,20 +46,10 @@ gulp.task("preCreate_WX", prevTasks, function() {
 			isOpendataProj = projInfo.layaProType === 12;
 		} catch (e) {}
 	}
-	if (isOpendataProj) {
-		return;
-	}
-	let copyLibsList = [`${workSpaceDir}/bin/libs/laya.wxmini.js`];
-	var stream = gulp.src(copyLibsList, { base: `${workSpaceDir}/bin` });
-	return stream.pipe(gulp.dest(releaseDir));
 });
 
 gulp.task("copyPlatformFile_WX", ["preCreate_WX"], function() {
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
-		return;
-	}
-	let adapterPath = path.join(ideModuleDir, "../", "out", "layarepublic", "LayaAirProjectPack", "lib", "data", "wxfiles");
+	let adapterPath = path.join(layarepublicPath, "LayaAirProjectPack", "lib", "data", "wxfiles");
 	// 开放域项目
 	if (isOpendataProj) {
 		let platformDir = path.join(adapterPath, "weapp-adapter.js");
@@ -89,25 +57,26 @@ gulp.task("copyPlatformFile_WX", ["preCreate_WX"], function() {
 		return stream.pipe(gulp.dest(releaseDir));
 	}
 	// 如果新建项目时已经点击了"微信/百度小游戏bin目录快速调试"，不再拷贝
-	let isHadWXFiles =
+	let hasPlatform =
 		fs.existsSync(path.join(workSpaceDir, "bin", "game.js")) &&
 		fs.existsSync(path.join(workSpaceDir, "bin", "game.json")) &&
-		fs.existsSync(path.join(workSpaceDir, "bin", "project.config.json")) &&
-		fs.existsSync(path.join(workSpaceDir, "bin", "weapp-adapter.js"));
-	if (isHadWXFiles) {
-		return;
+		fs.existsSync(path.join(workSpaceDir, "bin", "project.config.json"));
+	let hasPublishPlatform = 
+		fs.existsSync(path.join(releaseDir, "game.js")) &&
+		fs.existsSync(path.join(releaseDir, "game.json")) &&
+		fs.existsSync(path.join(releaseDir, "project.config.json"));
+	let copyLibsList;
+	if (hasPlatform || hasPublishPlatform) {
+		copyLibsList = [`${adapterPath}/weapp-adapter.js`];
+	} else {
+		copyLibsList = [`${adapterPath}/*.*`];
 	}
-	let copyLibsList = [`${adapterPath}/*.*`];
 	var stream = gulp.src(copyLibsList);
 	return stream.pipe(gulp.dest(releaseDir));
 });
 
 // 开放域的情况下，合并game.js和index.js，并删除game.js
-gulp.task("openData_WX", ["copyPlatformFile_WX"], function (cb) {
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
-		return cb();
-	}
+gulp.task("openData_WX", versiontask, function (cb) {
 	if (config.openDataZone) {
 		let versionCon;
 		if (config.version) {
@@ -143,10 +112,37 @@ function readFile(path) {
 	return null;
 }
 
-gulp.task("version_WX", ["openData_WX"], function() {
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
+gulp.task("modifyMinJs_WX", ["openData_WX"], function() {
+	if (config.openDataZone) {
 		return;
+	}
+	// 如果保留了平台文件，如果同时取消使用min类库，就会出现文件引用不正确的问题
+	if (config.keepPlatformFile) {
+		let fileJsPath = path.join(releaseDir, "game.js");
+		let content = fs.readFileSync(fileJsPath, "utf-8");
+		content = content.replace(/min\/laya(-[\w\d]+)?\.wxmini\.min\.js/gm, "laya.wxmini.js");
+		fs.writeFileSync(fileJsPath, content, 'utf-8');
+	}
+	if (!config.useMinJsLibs) {
+		return;
+	}
+	let fileJsPath = path.join(releaseDir, "game.js");
+	let content = fs.readFileSync(fileJsPath, "utf-8");
+	content = content.replace(/(min\/)?laya(-[\w\d]+)?\.wxmini(\.min)?\.js/gm, "min/laya.wxmini.min.js");
+	fs.writeFileSync(fileJsPath, content, 'utf-8');
+});
+
+gulp.task("version_WX", ["modifyMinJs_WX"], function() {
+	if (config.openDataZone) {
+		return;
+	}
+	// 如果保留了平台文件，如果同时开启版本管理，就会出现文件引用不正确的问题
+	if (config.keepPlatformFile) {
+		let fileJsPath = path.join(releaseDir, "game.js");
+		let content = fs.readFileSync(fileJsPath, "utf-8");
+		content = content.replace(/laya(-[\w\d]+)?\.wxmini/gm, "laya.wxmini");
+		content = content.replace(/index(-[\w\d]+)?\.js/gm, "index.js");
+		fs.writeFileSync(fileJsPath, content, 'utf-8');
 	}
 	if (config.version) {
 		let versionPath = releaseDir + "/version.json";
@@ -159,10 +155,6 @@ gulp.task("version_WX", ["openData_WX"], function() {
 });
 
 gulp.task("optimizeOpen_WX", ["version_WX"], function(cb) {
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
-		return cb();
-	}
 	let wxOptimize = config.wxOptimize;
 	if (!wxOptimize || !wxOptimize.useOptimizeOpen) { // 没有使用微信引擎插件，还是像以前一样发布
 		return cb();
@@ -189,11 +181,20 @@ gulp.task("optimizeOpen_WX", ["version_WX"], function(cb) {
 });
 
 gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
-	// 如果不是微信小游戏
-	if (platform !== "wxgame") {
-		return cb();
-	}
-	if (!config.uesEnginePlugin) { // 没有使用微信引擎插件，还是像以前一样发布
+	if (!config.uesEnginePlugin) { // 没有使用引擎插件，还是像以前一样发布
+		let gameJsonPath = path.join(releaseDir, "game.json");
+		let gameJsonContent = fs.readFileSync(gameJsonPath, "utf8");
+		let conJson = JSON.parse(gameJsonContent);
+		if (conJson.plugins) {
+			delete conJson.plugins;
+			gameJsonContent = JSON.stringify(conJson, null, 4);
+			fs.writeFileSync(gameJsonPath, gameJsonContent, "utf8");
+
+			let gameJsPath = path.join(releaseDir, "game.js");
+			let gameJscontent = fs.readFileSync(gameJsPath, "utf8");
+			gameJscontent = gameJscontent.replace(/requirePlugin\("[\w\/\.]+"\);?\n?/mg, "");
+			fs.writeFileSync(gameJsPath, gameJscontent, "utf8");
+		}
 		return cb();
 	}
 	if (config.version) {
@@ -207,11 +208,12 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 	let coreLibPath = path.join(workSpaceDir, "bin", "libs", "laya.core.js");
 	let isHasCoreLib = fs.existsSync(coreLibPath);
 	let isOldAsProj = fs.existsSync(`${workSpaceDir}/asconfig.json`) && !isHasCoreLib;
+	let isNewTsProj = fs.existsSync(`${workSpaceDir}/src/tsconfig.json`) && !isHasCoreLib;
 	let EngineVersion = getEngineVersion();
 	if (!EngineVersion) {
 		throw new Error(`读取引擎版本号失败，请于服务提供商联系!`);
 	}
-	if (!EngineVersion || EngineVersion.includes("beta") || !canUsePluginEngine(EngineVersion)) {
+	if (!EngineVersion || EngineVersion.includes("beta") || !canUsePluginEngine(EngineVersion, minPluginVersion)) {
 		throw new Error(`该版本引擎无法使用引擎插件功能(engineVersion: ${EngineVersion})`);
 	}
 	console.log(`通过版本号检查:  ${EngineVersion}`);
@@ -223,7 +225,8 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 		// 1) 修改game.js和game.json
 		// 修改game.js
 		let gameJsPath = path.join(releaseDir, "game.js");
-		let gameJscontent = `require("weapp-adapter.js");\nrequire("./libs/laya.wxmini.js");\nrequirePlugin('layaPlugin');\nwindow.loadLib = require;\nrequire("./${indexJsStr}");`;
+		let platformJs = config.useMinJsLibs ? `require("./libs/min/laya.wxmini.min.js");` : `require("./libs/laya.wxmini.js");`;
+		let gameJscontent = `require("weapp-adapter.js");\n${platformJs}\nrequirePlugin('layaPlugin');\nwindow.loadLib = require;\nrequire("./${indexJsStr}");`;
 		fs.writeFileSync(gameJsPath, gameJscontent, "utf8");
 		// 修改game.json，使其支持引擎插件
 		let gameJsonPath = path.join(releaseDir, "game.json");
@@ -248,22 +251,34 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 			let item, fullRequireItem;
 			for (let i = 0, len = fullRemoteEngineList.length; i < len; i++) {
 				item = fullRemoteEngineList[i];
-				fullRequireItem = `loadLib("libs/${item}")`;
+				fullRequireItem = config.useMinJsLibs ? `loadLib("libs/min/${item}")` : `loadLib("libs/${item}")`;
 				if (indexJsCon.includes(fullRequireItem)) {
-					localUseEngineList.push(item);
-					indexJsCon = indexJsCon.replace(fullRequireItem, "");
+					let _item = item.replace(".min.js", ".js"), _minItem = item;
+					localUseEngineList.push(_item);
+					indexJsCon = indexJsCon.replace(fullRequireItem + ";", "").replace(fullRequireItem + ",", "").replace(fullRequireItem, "");
+					// 如果引用了压缩的类库，将其重命名为未压缩的类库，并拷贝到libs中
+					if (config.useMinJsLibs) {
+						let oldMinlibPath = path.join(releaseDir, "libs", "min", _minItem);
+						let newMinlibPath = path.join(releaseDir, "libs", "min", _item);
+						let newlibPath = path.join(releaseDir, "libs", _item);
+						fs.renameSync(oldMinlibPath, newMinlibPath);
+						// fs.copyFileSync(newlibPath, newMinlibPath);
+						let con = fs.readFileSync(newMinlibPath, "utf8");
+						fs.writeFileSync(newlibPath, con, "utf8");
+						fs.unlinkSync(newMinlibPath);
+					}
 				}
 			}
-			if (isOldAsProj) { // 如果as语言，开发者将laya.js也写入index.js中了，将其删掉
+			if (isOldAsProj || isNewTsProj) { // 如果as||ts_new语言，开发者将laya.js也写入index.js中了，将其删掉
 				fullRequireItem = `loadLib("laya.js")`;
 				if (indexJsCon.includes(fullRequireItem)) {
-					indexJsCon = indexJsCon.replace(fullRequireItem, "");
+					indexJsCon = indexJsCon.replace(fullRequireItem + ";", "").replace(fullRequireItem + ",", "").replace(fullRequireItem, "");
 				}
 			}
 			fs.writeFileSync(indexJsPath, indexJsCon, "utf8");
 			// ts/js再次修改game.js，仅引用使用到的类库
-			// as因为本地只有laya.js，无法仅引用使用到的类库
-			if (!isOldAsProj) {
+			// as||ts_new因为本地只有laya.js，无法仅引用使用到的类库
+			if (!isOldAsProj && !isNewTsProj) {
 				let pluginCon = "";
 				localUseEngineList.forEach(function(item) {
 					pluginCon += `requirePlugin("layaPlugin/${item}");\n`;
@@ -279,8 +294,9 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 		return new Promise(function(resolve, reject) {
 			console.log(`将本地的引擎插件移动到laya-libs中`);
 			// 3) 将本地的引擎插件移动到laya-libs中
-			copyEnginePathList = [`${releaseDir}/libs/{${localUseEngineList.join(",")}}`];
-			if (isOldAsProj) { // 单独拷贝laya.js
+			let libsPath = /** config.useMinJsLibs ? `${releaseDir}/libs/min` : */`${releaseDir}/libs`;
+			copyEnginePathList = [`${libsPath}/{${localUseEngineList.join(",")}}`];
+			if (isOldAsProj || isNewTsProj) { // 单独拷贝laya.js
 				copyEnginePathList = [`${releaseDir}/laya.js`];
 			}
 			gulp.src(copyEnginePathList).pipe(gulp.dest(`${releaseDir}/laya-libs`));
@@ -296,7 +312,7 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 		return new Promise(async function(resolve, reject) {
 			console.log(`完善引擎插件目录`);
 			// 5) 引擎插件目录laya-libs中还需要新建几个文件，使该目录能够使用
-			if (isOldAsProj) { // 单独拷贝laya.js
+			if (isOldAsProj || isNewTsProj) { // 单独拷贝laya.js
 				localUseEngineList.push("laya.js");
 			}
 			let 
@@ -316,7 +332,7 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 			// plugin.json
 			let pluginCon = {"main": "index.js"};
 			fs.writeFileSync(engineplugin, JSON.stringify(pluginCon, null, 4), "utf8");
-			// signature.json
+			// signature.json，目前平台方将其作为保留用途，不会做插件的md5校验；IDE仍将生成md5
 			let signatureCon = {
 				"provider": provider,
 				"signature": []
@@ -341,77 +357,6 @@ gulp.task("pluginEngin_WX", ["optimizeOpen_WX"], function(cb) {
 		throw e;
 	})
 });
-
-function getEngineVersion() {
-	let coreLibPath = path.join(workSpaceDir, "bin", "libs", "laya.core.js");
-	let isHasCoreLib = fs.existsSync(coreLibPath);
-	let isOldAsProj = fs.existsSync(`${workSpaceDir}/asconfig.json`) && !isHasCoreLib;
-	let isNewTsProj = fs.existsSync(`${workSpaceDir}/src/tsconfig.json`) && !isHasCoreLib;
-	let EngineVersion;
-	if (isHasCoreLib) {
-		let con = fs.readFileSync(coreLibPath, "utf8");
-		let matchList = con.match(/Laya\.version\s*=\s*['"]([0-9\.]+(beta)?.*)['"]/);
-		if (!Array.isArray(matchList)) {
-			return null;
-		}
-		EngineVersion = matchList[1];
-	} else { // newts项目和旧版本as项目
-		if (isOldAsProj) {
-			let coreLibFilePath = path.join(workSpaceDir, "libs", "laya", "src", "Laya.as");
-			if (!fs.existsSync(coreLibFilePath)) {
-				return null;
-			}
-			let con = fs.readFileSync(coreLibFilePath, "utf8");
-			let matchList = con.match(/version:String\s*=\s*['"]([0-9\.]+(beta)?.*)['"]/);
-			if (!Array.isArray(matchList)) {
-				return null;
-			}
-			EngineVersion = matchList[1];
-		} else if (isNewTsProj) {
-			let coreLibFilePath = path.join(workSpaceDir, "libs", "Laya.ts");
-			if (!fs.existsSync(coreLibFilePath)) {
-				return null;
-			}
-			let con = fs.readFileSync(coreLibFilePath, "utf8");
-			let matchList = con.match(/static\s*version:\s*string\s*=\s*['"]([0-9\.]+(beta)?.*)['"]/);
-			if (!Array.isArray(matchList)) {
-				return null;
-			}
-			EngineVersion = matchList[1];
-		}
-	}
-	return EngineVersion;
-}
-
-function getFileMd5(filePath) {
-	return new Promise(function(resolve, reject) {
-		let md5 = crypto.createHash('md5');
-		let stream = fs.createReadStream(filePath);
-		stream.on("data", function(data) {
-			md5.update(data);
-		});
-		stream.on("end", function() {
-			let md5Str = md5.digest('hex');
-			return resolve(md5Str);
-		});
-	});
-}
-
-function canUsePluginEngine(version) {
-	const minVersionNum = "2.0.2";
-	let compileMacthList = minVersionNum.match(/^(\d+)\.(\d+)\.(\d+)/);
-	let matchList = version.match(/^(\d+)\.(\d+)\.(\d+)/);
-    if (matchList[1] > compileMacthList[1]) {
-        return true;
-	}
-    if (matchList[1] === compileMacthList[1] && matchList[2] > compileMacthList[2]) {
-        return true;
-    }
-    if (matchList[1] === compileMacthList[1] && matchList[2] === compileMacthList[2] && matchList[3] >= compileMacthList[3]) {
-        return true;
-    }
-    return false;
-}
 
 gulp.task("buildWXProj", ["pluginEngin_WX"], function() {
 	console.log("all tasks completed");

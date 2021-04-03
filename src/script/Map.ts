@@ -228,6 +228,7 @@ export default class Map{
             }
             if(count > 100){
                 console.log("映射失败！");
+                location.reload();
                 break;
             }
         }

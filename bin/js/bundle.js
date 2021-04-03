@@ -225,6 +225,7 @@
             if (subG.nodes[index].candidates.length == 0) {
                 return false;
             }
+            let newMatch = [];
             for (let i = 0; i < subG.nodes[index].candidates.length; i++) {
                 let candidate = subG.nodes[index].candidates[i];
                 let tmpMatch = [];
@@ -541,6 +542,7 @@
                 }
                 if (count > 100) {
                     console.log("映射失败！");
+                    location.reload();
                     break;
                 }
             }
@@ -693,11 +695,23 @@
             let gridheight = 30;
             let marginwidth = 10;
             let marginheight = 5;
-            this.width = gridwidth * width;
-            this.height = 20 * height;
+            this.skin = ("comp/dialogue-bubble.png");
+            this.width = gridwidth * (width + 2);
+            this.height = gridheight * (height + 2);
+            this.sizeGrid = "20,20,20,20";
+        }
+        redraw(x, y) {
+            let map = this.map;
+            let width = map[0].length;
+            let height = map.length;
+            let gridwidth = 60;
+            let gridheight = 30;
+            let marginwidth = 10;
+            let marginheight = 5;
             for (let j = 0; j < height; j++) {
                 for (let i = 0; i < width; i++) {
-                    if (map[j][i] == null) ;
+                    if (map[j][i] == null) {
+                    }
                     else {
                         let tmpmap = map[j][i];
                         let groundcolor = "#00ff00";
@@ -714,49 +728,49 @@
                             groundcolor = "#9f8f8f";
                             barriercolor = "#0c0c0c";
                         }
-                        this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, gridheight, groundcolor, groundcolor);
+                        this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight, gridwidth, gridheight, groundcolor, groundcolor);
                         if (tmpmap.upConnect) {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
-                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth + (gridwidth - marginwidth), (j + 1) * gridheight, marginwidth, marginheight, barriercolor, barriercolor);
                         }
                         else {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight, gridwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight, gridwidth, marginheight, barriercolor, barriercolor);
                         }
                         if (tmpmap.downConnect) {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
-                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginwidth), j * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth + (gridwidth - marginwidth), (j + 1) * gridheight + (gridheight - marginheight), marginwidth, marginheight, barriercolor, barriercolor);
                         }
                         else {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), gridwidth, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight + (gridheight - marginheight), gridwidth, marginheight, barriercolor, barriercolor);
                         }
                         if (tmpmap.leftConnect) {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
-                            this.graphics.drawRect(i * gridwidth, j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
                         }
                         else {
-                            this.graphics.drawRect(i * gridwidth, j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth, (j + 1) * gridheight, marginheight, gridheight, barriercolor, barriercolor);
                         }
                         if (tmpmap.rightConnect) {
-                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, marginheight, barriercolor, barriercolor);
-                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth + (gridwidth - marginheight), (j + 1) * gridheight, marginheight, marginheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth + (gridwidth - marginheight), (j + 1) * gridheight + (gridheight - marginheight), marginheight, marginheight, barriercolor, barriercolor);
                         }
                         else {
-                            this.graphics.drawRect(i * gridwidth + (gridwidth - marginheight), j * gridheight, marginheight, gridheight, barriercolor, barriercolor);
+                            this.graphics.drawRect((i + 1) * gridwidth + (gridwidth - marginheight), (j + 1) * gridheight, marginheight, gridheight, barriercolor, barriercolor);
                         }
-                        if (tmpmap.node.type == NodeType.e) {
-                            this.graphics.fillText("🦸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                        if (i == x && j == y) {
+                            this.graphics.fillText("🦸", (i + 1) * gridwidth + gridwidth / 2.0, (j + 1) * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
                         }
                         if (tmpmap.node.type == NodeType.b) {
-                            this.graphics.fillText("👹", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                            this.graphics.fillText("👹", (i + 1) * gridwidth + gridwidth / 2.0, (j + 1) * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
                         }
                         if (tmpmap.node.type == NodeType.g) {
-                            this.graphics.fillText("👸", i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                            this.graphics.fillText("👸", (i + 1) * gridwidth + gridwidth / 2.0, (j + 1) * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
                         }
                         if (tmpmap.node.type == NodeType.k) {
-                            this.graphics.fillText("🔑" + tmpmap.node.keyTo[0], i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                            this.graphics.fillText("🔑" + tmpmap.node.keyTo[0], (i + 1) * gridwidth + gridwidth / 2.0, (j + 1) * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
                         }
                         if (tmpmap.node.type == NodeType.l) {
-                            this.graphics.fillText("🔒" + tmpmap.node.index, i * gridwidth + gridwidth / 2.0, j * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
+                            this.graphics.fillText("🔒" + tmpmap.node.index, (i + 1) * gridwidth + gridwidth / 2.0, (j + 1) * gridheight + gridheight * 0.3, "20px Arial", "#000000", "center");
                         }
                     }
                 }
@@ -821,6 +835,8 @@
         constructor() {
             super(...arguments);
             this.action = CharacterAction.None;
+            this.hurtFrame = 0;
+            this.invincibleStatus = false;
         }
         setDirection(_x, _y) {
             this.x = _x;
@@ -903,11 +919,48 @@
                 this.y /= mod;
             }
         }
+        addExp() {
+            console.log("AddExp");
+        }
         onUpdate() {
-            if (this.HP <= 0) {
+            if (this.HP <= 0 && this.hurtFrame == 0) {
+                this.addExp();
                 this.owner.x = -100;
                 this.owner.y = -100;
                 this.removeOwner(this.owner);
+            }
+            if (this.hurtFrame > 0) {
+                const ColorFilter = Laya.ColorFilter;
+                let redMat;
+                if (this.HP > 0) {
+                    redMat = [
+                        1, 0, 0, 0, 0,
+                        0, 1 - this.hurtFrame / 40, 0, 0, 0,
+                        0, 0, 1 - this.hurtFrame / 40, 0, 0,
+                        0, 0, 0, 1, 0
+                    ];
+                }
+                else {
+                    redMat = [
+                        1, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, this.hurtFrame / 40, 0
+                    ];
+                }
+                let redFilter = new ColorFilter(redMat);
+                this.owner.filters = [redFilter];
+                this.hurtFrame--;
+                this.invincibleStatus = true;
+                let hpbar = this.owner.getChildByName("hpbar");
+                if (hpbar) {
+                    hpbar.graphics.drawRect(0, 0, 16, 4, "#000000");
+                    hpbar.graphics.drawRect(1, 1, 14 * this.HP / this.maxHP, 2, "#ff0000");
+                }
+            }
+            else {
+                this.owner.filters = [];
+                this.invincibleStatus = false;
             }
         }
         removeOwner(owner) {
@@ -936,6 +989,7 @@
             super(...arguments);
             this.AItick = 0;
             this.maxHP = 2;
+            this.damage = 1;
         }
         onStart() {
             this.x = 0;
@@ -951,6 +1005,11 @@
         onUpdate() {
             super.onUpdate();
             this.AI();
+        }
+        addExp() {
+            super.addExp();
+            Player.exp += 2;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
         }
         AI() {
             this.AItick++;
@@ -973,6 +1032,15 @@
             }
             this.doMove();
         }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
     }
     GrassEnemy1.BattlePoint = 1;
     GrassEnemy1.skinname = "Enemy/3.png";
@@ -982,6 +1050,7 @@
             super(...arguments);
             this.AItick = 0;
             this.maxHP = 2;
+            this.damage = 2;
         }
         onStart() {
             this.x = 0;
@@ -998,6 +1067,11 @@
             super.onUpdate();
             this.AI();
         }
+        addExp() {
+            super.addExp();
+            Player.exp += 2;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
         AI() {
             this.AItick++;
             if (this.action == CharacterAction.Attack) {
@@ -1019,6 +1093,15 @@
             }
             this.doMove();
         }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
     }
     SandEnemy1.BattlePoint = 1;
     SandEnemy1.skinname = "Enemy/2.png";
@@ -1028,6 +1111,7 @@
             super(...arguments);
             this.AItick = 0;
             this.maxHP = 1;
+            this.damage = 1;
         }
         onStart() {
             this.x = 0;
@@ -1044,6 +1128,11 @@
             super.onUpdate();
             this.AI();
         }
+        addExp() {
+            super.addExp();
+            Player.exp += 2;
+            BattleScene.Lv.text = "lv. " + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
         AI() {
             this.AItick++;
             if (this.action == CharacterAction.Attack) {
@@ -1065,6 +1154,15 @@
             }
             this.doMove();
         }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
     }
     SnowEnemy1.BattlePoint = 1;
     SnowEnemy1.skinname = "Enemy/7.png";
@@ -1074,6 +1172,7 @@
             super(...arguments);
             this.AItick = 0;
             this.maxHP = 2;
+            this.damage = 1;
         }
         onStart() {
             this.x = 0;
@@ -1090,6 +1189,11 @@
             super.onUpdate();
             this.AI();
         }
+        addExp() {
+            super.addExp();
+            Player.exp += 2;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
         AI() {
             this.AItick++;
             if (this.action == CharacterAction.Attack) {
@@ -1111,6 +1215,15 @@
             }
             this.doMove();
         }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
     }
     LavaEnemy1.BattlePoint = 1;
     LavaEnemy1.skinname = "Enemy/19.png";
@@ -1124,7 +1237,7 @@
             EnemyFactory.mainsp = battlesprite;
             EnemyFactory.enemylist = [];
         }
-        initEnemy(regiontype, enemyforce) {
+        initEnemy(regiontype, enemyforce, battlemap) {
             let Enemies = [];
             if (regiontype == RegionType.Grass) {
                 Enemies = this.grassEnemies;
@@ -1148,8 +1261,19 @@
                 fc.sheet = "一八匕厂 刀儿二几 力人入十 又川寸大";
                 fc.scaleX = fc.scaleY = 3;
                 fc.value = "一";
-                fc.x = 96 + Math.random() * 96 * 8;
-                fc.y = 96 + Math.random() * 96 * 3;
+                let xindex = Math.floor(Math.random() * 8);
+                let yindex = Math.floor(Math.random() * 3);
+                while (true) {
+                    if (battlemap[yindex + 1][xindex + 1] == 0) {
+                        break;
+                    }
+                    else {
+                        xindex = Math.floor(Math.random() * 8);
+                        yindex = Math.floor(Math.random() * 3);
+                    }
+                }
+                fc.x = 96 * (xindex + 1) + Math.floor(32 + Math.random() * 32);
+                fc.y = 96 * (yindex + 1) + Math.floor(32 + Math.random() * 32);
                 let rigid = fc.getComponent(Laya.RigidBody);
                 if (!rigid) {
                     rigid = fc.addComponent(Laya.RigidBody);
@@ -1168,6 +1292,15 @@
                 }
                 enemy = fc.addComponent(Enemy);
                 enemy.HP = enemy.maxHP;
+                let hpbar = fc.getChildByName("hpbar");
+                if (!hpbar) {
+                    hpbar = new Laya.Image();
+                    hpbar.name = "hpbar";
+                    hpbar.y = -5;
+                    fc.addChild(hpbar);
+                }
+                hpbar.graphics.drawRect(0, 0, 16, 4, "#000000");
+                hpbar.graphics.drawRect(1, 1, 14, 2, "#ff0000");
                 EnemyFactory.enemylist.push(fc);
                 EnemyFactory.mainsp.addChild(fc);
                 enemyforce -= Enemy.BattlePoint;
@@ -1194,17 +1327,20 @@
             }
         }
         onTriggerEnter(other) {
-            let player = other.owner.getComponent(Player);
-            if (player) {
-                console.log(true);
-            }
-            else {
-                let character = other.owner.getComponent(Character);
-                if (character) {
-                    character.HP -= this.damage;
+            if (this.owner && other.owner) {
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                    console.log(true);
                 }
-                let owner = this.owner;
-                this.removeOwner(owner);
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character && !character.invincibleStatus) {
+                        character.hurtFrame = 20;
+                        character.HP -= this.damage;
+                    }
+                    let owner = this.owner;
+                    this.removeOwner(owner);
+                }
             }
         }
         removeOwner(owner) {
@@ -1242,6 +1378,23 @@
         }
         onUpdate() {
             super.onUpdate();
+            for (let i = 0; i < BattleScene.hearts.length; i++) {
+                if (this.maxHP / 4.0 <= i) {
+                    BattleScene.hearts[i].visible = false;
+                }
+                else {
+                    BattleScene.hearts[i].visible = true;
+                    if (this.HP / 4.0 >= i + 1) {
+                        BattleScene.hearts[i].index = 0;
+                    }
+                    else if (this.HP / 4.0 < i) {
+                        BattleScene.hearts[i].index = 4;
+                    }
+                    else {
+                        BattleScene.hearts[i].index = Math.round(4 - (this.HP / 4.0 - i) * 4);
+                    }
+                }
+            }
             if (this.x == 0 && this.y == 0) {
                 this.attacktick++;
                 if (this.action != CharacterAction.Attack) {
@@ -1251,7 +1404,6 @@
                 if (this.attacktick < this.attackInterval) {
                     let res = this.onAttackWait();
                     if (!res) {
-                        EnemyFactory.clearEnemey();
                         this.attacktick--;
                     }
                 }
@@ -1317,6 +1469,9 @@
             BulletFactory.initBullet(PlayerArrow, owner.x, owner.y, this.dirx, this.diry);
         }
     }
+    Player.Level = 1;
+    Player.exp = 0;
+    Player.maxExp = 10;
 
     class toDown extends Laya.Script {
         constructor() {
@@ -1465,7 +1620,7 @@
                     }
                 }
             }
-            this.enemyFactory.initEnemy(regiontype, enemyforce);
+            this.enemyFactory.initEnemy(regiontype, enemyforce, battlemap);
         }
         clearTiles() {
             for (let j = 0; j < 5; j++) {
@@ -1514,6 +1669,7 @@
             this.loadScene("BattleScene");
         }
         onAwake() {
+            BattleScene.Lv = this.lv;
             BattleScene.battleimagedeal = [];
             BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite1));
             BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite2));
@@ -1522,18 +1678,27 @@
             BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
             BattleScene.battleimagedeal[1 - BattleScene.battleindex].mainsp.visible = false;
             let playercontroller = this.player.getComponent(Player);
-            playercontroller.HP = playercontroller.maxHP = 15;
+            playercontroller.maxHP = 12;
+            playercontroller.HP = 12;
             BattleScene.player = this.player;
-            let MapImage = new Smallthis(BattleScene.regionmap);
-            MapImage.visible = false;
-            this.addChild(MapImage);
-            MapImage.centerX = 0;
-            MapImage.centerY = 0;
-            this.map_button.on(Laya.Event.CLICK, this, () => { MapImage.visible = !MapImage.visible; console.log("map"); });
+            BattleScene.MapImage = new Smallthis(BattleScene.regionmap);
+            BattleScene.MapImage.visible = false;
+            this.addChild(BattleScene.MapImage);
+            BattleScene.MapImage.centerX = 0;
+            BattleScene.MapImage.centerY = 0;
+            this.map_button.on(Laya.Event.CLICK, BattleScene, () => { BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY); BattleScene.MapImage.visible = !BattleScene.MapImage.visible; console.log("map"); });
             this.controller = new GameControl(playercontroller);
+            BattleScene.hearts = [];
+            BattleScene.hearts.push(this.heart1);
+            BattleScene.hearts.push(this.heart2);
+            BattleScene.hearts.push(this.heart3);
+            BattleScene.hearts.push(this.heart4);
+            BattleScene.hearts.push(this.heart5);
+            BattleScene.hearts.push(this.heart6);
             this.addChild(this.controller);
         }
         static switchMap(delx, dely) {
+            BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY);
             console.log(BattleScene.regionmap);
             let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
             let preindex = BattleScene.battleindex;
@@ -1552,11 +1717,13 @@
         }
     }
     BattleScene.battleindex = 0;
+    BattleScene.hearts = [];
     BattleScene.tmpMapX = 0;
     BattleScene.tmpMapY = 0;
 
     class GameConfig {
-        constructor() { }
+        constructor() {
+        }
         static init() {
             var reg = Laya.ClassUtils.regClass;
             reg("scene/BattleScene.ts", BattleScene);

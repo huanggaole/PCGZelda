@@ -109,7 +109,7 @@ export default class BattleImage{
             }
         }
         // 将敌人添加到地图上
-        this.enemyFactory.initEnemy(regiontype,enemyforce);
+        this.enemyFactory.initEnemy(regiontype,enemyforce,battlemap);
     }
 
     clearTiles(){

@@ -1,6 +1,7 @@
 import BattleScene from "../scene/BattleScene";
 import BulletFactory from "../map/BulletFactory";
 import EnemyFactory from "../map/EnemyFactory";
+import Player from "./Player";
 
 export enum CharacterAction{
     None,
@@ -23,6 +24,10 @@ export default class Character extends Laya.Script{
     HP:number;
 
     action:CharacterAction = CharacterAction.None;
+
+    hurtFrame = 0;
+    invincibleStatus = false;
+    
 
     static Values = [["一","八","匕","厂"],["刀","儿","二","几"],["力","人","入","十"],["又","川","寸","大"],["飞","干","工","弓"],["广","己","口","马"],["门","女","山","尸"]];
 
@@ -112,13 +117,52 @@ export default class Character extends Laya.Script{
             this.y /= mod;
         }
     }
-    
+    addExp(){
+        console.log("AddExp");
+    }
     onUpdate(){
-        if(this.HP <= 0){
+        if(this.HP <= 0 && this.hurtFrame == 0){
+            this.addExp();
             (this.owner as Laya.FontClip).x = -100;
             (this.owner as Laya.FontClip).y = -100;
             this.removeOwner(this.owner);
-            // this.enabled = false;
+        }
+        if(this.hurtFrame > 0){
+            const ColorFilter = Laya.ColorFilter;
+            //由 20 个项目（排列成 4 x 5 矩阵）组成的数组，红色
+            let redMat;
+            if(this.HP > 0){
+            redMat = [
+                    1, 0, 0, 0, 0, // R
+                    0, 1 - this.hurtFrame / 40, 0, 0, 0, // G
+                    0, 0, 1 - this.hurtFrame / 40, 0, 0, // B
+                    0, 0, 0, 1, 0  // A
+                ];
+            }else{
+                redMat = [
+                    1, 0, 0, 0, 0, // R
+                    0, 0, 0, 0, 0, // G
+                    0, 0, 0, 0, 0, // B
+                    0, 0, 0, this.hurtFrame / 40, 0  // A
+                ];
+            }
+            
+            // 创建一个颜色滤镜对象,红色
+            let redFilter = new ColorFilter(redMat);
+
+            (this.owner as Laya.Clip).filters = [redFilter];
+
+            this.hurtFrame --;
+            this.invincibleStatus = true;
+            // 修改血条
+            let hpbar = this.owner.getChildByName("hpbar") as Laya.Image;
+            if(hpbar){
+                hpbar.graphics.drawRect(0, 0, 16, 4,"#000000");
+                hpbar.graphics.drawRect(1, 1, 14 * this.HP / this.maxHP, 2, "#ff0000");
+            }
+        }else{
+            (this.owner as Laya.Clip).filters = [];
+            this.invincibleStatus = false;
         }
     }
     removeOwner(owner){

@@ -2,7 +2,11 @@ import Character, { CharacterAction } from "./Character"
 import EnemyFactory from "../map/EnemyFactory";
 import BulletFactory from "../map/BulletFactory";
 import { PlayerArrow } from "../bullet/PlayerArrow";
+import BattleScene from "../scene/BattleScene";
 export default class Player extends Character{
+    static Level = 1;
+    static exp = 0;
+    static maxExp = 10;
     attacktick = 0;
     
     attackInterval = 20;
@@ -10,7 +14,22 @@ export default class Player extends Character{
     attackAft = 5;
 
     onUpdate(){
-        super.onUpdate();        
+        super.onUpdate();
+        // 刷新HP的显示
+        for(let i = 0; i < BattleScene.hearts.length; i++){
+            if(this.maxHP / 4.0 <= i){
+                BattleScene.hearts[i].visible = false;
+            }else{
+                BattleScene.hearts[i].visible = true;
+                if(this.HP / 4.0 >= i + 1){
+                    BattleScene.hearts[i].index = 0;
+                }else if(this.HP / 4.0 < i){
+                    BattleScene.hearts[i].index = 4;
+                }else{
+                    BattleScene.hearts[i].index = Math.round(4 - (this.HP / 4.0 - i) * 4);
+                }
+            }
+        }  
         if(this.x == 0 && this.y == 0){
             this.attacktick++;
             if(this.action != CharacterAction.Attack){
@@ -20,7 +39,7 @@ export default class Player extends Character{
             if(this.attacktick < this.attackInterval){
                 let res = this.onAttackWait();
                 if(!res){
-                    EnemyFactory.clearEnemey();
+                    // EnemyFactory.clearEnemey();
                     this.attacktick--;
                 }
             }else if(this.attacktick < this.attackInterval + this.attackPre){

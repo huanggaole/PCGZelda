@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":84,
+    "selecteID":98,
     "searchKey":"Scene",
     "props":{"width":960,"sceneColor":"#000000","height":640},
     "nodeParent":-1,
-    "maxID":85,
+    "maxID":99,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -574,6 +574,105 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":84,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart1",
+            "props":{"y":9,"x":12,"var":"heart1","skin":"comp/heart.png","scaleY":4,"scaleX":4,"index":0,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart1",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":87,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart2",
+            "props":{"y":9,"x":82,"var":"heart2","skin":"comp/heart.png","scaleY":4,"scaleX":4,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart2",
+            "isOpen":true,
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":89,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart3",
+            "props":{"y":9,"x":152,"var":"heart3","skin":"comp/heart.png","scaleY":4,"scaleX":4,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart3",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":91,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart4",
+            "props":{"y":9,"x":222,"var":"heart4","skin":"comp/heart.png","scaleY":4,"scaleX":4,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart4",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":92,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart5",
+            "props":{"y":9,"x":292,"var":"heart5","skin":"comp/heart.png","scaleY":4,"scaleX":4,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart5",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":93,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Clip",
+            "searchKey":"Clip,heart6",
+            "props":{"y":9,"x":362,"var":"heart6","skin":"comp/heart.png","scaleY":4,"scaleX":4,"clipY":1,"clipX":5},
+            "nodeParent":2,
+            "label":"heart6",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":94,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "searchKey":"Label,lv",
+            "props":{"y":37,"x":514,"width":311,"var":"lv","text":"lv. 1  exp/next:0/10","height":35,"fontSize":30,"color":"#ffffff"},
+            "nodeParent":2,
+            "label":"lv",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":98,
             "child":[
                 ]
         }],

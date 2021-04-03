@@ -11,8 +11,20 @@ export default class Smallthis extends Laya.Image{
 		let gridheight = 30;
 		let marginwidth = 10;
 		let marginheight = 5;
-		this.width = gridwidth * width;
-		this.height = 20 * height;
+		this.skin = ("comp/dialogue-bubble.png");
+		this.width = gridwidth * (width + 2);
+		this.height = gridheight * (height + 2);
+		this.sizeGrid = "20,20,20,20";
+	}
+	
+	redraw(x:number,y:number){
+		let map = this.map;
+		let width = map[0].length;
+		let height = map.length;
+		let gridwidth = 60;
+		let gridheight = 30;
+		let marginwidth = 10;
+		let marginheight = 5;
 		for(let j = 0; j < height; j++){
 			for(let i = 0; i < width; i++){
 				if(map[j][i]==null){
@@ -31,55 +43,55 @@ export default class Smallthis extends Laya.Image{
 						groundcolor = "#9f8f8f";
 						barriercolor = "#0c0c0c";
 					}
-					this.graphics.drawRect(i*gridwidth,j*gridheight,gridwidth,gridheight,groundcolor,groundcolor);
+					this.graphics.drawRect((i + 1) *gridwidth,(j + 1)*gridheight,gridwidth,gridheight,groundcolor,groundcolor);
 					if(tmpmap.upConnect){
-						this.graphics.drawRect(i*gridwidth,j*gridheight,marginwidth,marginheight,barriercolor,barriercolor);
-						this.graphics.drawRect(i*gridwidth + (gridwidth - marginwidth),j*gridheight,marginwidth,marginheight,barriercolor,barriercolor);						
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight,marginwidth,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth + (gridwidth - marginwidth),(j + 1)*gridheight,marginwidth,marginheight,barriercolor,barriercolor);						
 					}else{
-						this.graphics.drawRect(i*gridwidth,j*gridheight,gridwidth,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight,gridwidth,marginheight,barriercolor,barriercolor);
 					}
 
 					if(tmpmap.downConnect){
-						this.graphics.drawRect(i*gridwidth,j*gridheight + (gridheight - marginheight),marginwidth,marginheight,barriercolor,barriercolor);
-						this.graphics.drawRect(i*gridwidth + (gridwidth - marginwidth),j*gridheight + (gridheight - marginheight),marginwidth,marginheight,barriercolor,barriercolor);						
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight + (gridheight - marginheight),marginwidth,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth + (gridwidth - marginwidth),(j + 1)*gridheight + (gridheight - marginheight),marginwidth,marginheight,barriercolor,barriercolor);						
 					}else{
-						this.graphics.drawRect(i*gridwidth,j*gridheight + (gridheight - marginheight), gridwidth,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight + (gridheight - marginheight), gridwidth,marginheight,barriercolor,barriercolor);
 					}
 
 					if(tmpmap.leftConnect){
-						this.graphics.drawRect(i*gridwidth,j*gridheight,marginheight,marginheight,barriercolor,barriercolor);
-						this.graphics.drawRect(i*gridwidth,j*gridheight + (gridheight - marginheight),marginheight,marginheight,barriercolor,barriercolor);						
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight,marginheight,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight + (gridheight - marginheight),marginheight,marginheight,barriercolor,barriercolor);						
 					}else{
-						this.graphics.drawRect(i*gridwidth,j*gridheight,marginheight,gridheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth,(j + 1)*gridheight,marginheight,gridheight,barriercolor,barriercolor);
 					}
 
 					if(tmpmap.rightConnect){
-						this.graphics.drawRect(i*gridwidth + (gridwidth - marginheight),j * gridheight,marginheight,marginheight,barriercolor,barriercolor);
-						this.graphics.drawRect(i*gridwidth + (gridwidth - marginheight),j * gridheight + (gridheight - marginheight),marginheight,marginheight,barriercolor,barriercolor);							
+						this.graphics.drawRect((i + 1)*gridwidth + (gridwidth - marginheight),(j + 1) * gridheight,marginheight,marginheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth + (gridwidth - marginheight),(j + 1) * gridheight + (gridheight - marginheight),marginheight,marginheight,barriercolor,barriercolor);							
 					}else{
-						this.graphics.drawRect(i*gridwidth + (gridwidth - marginheight),j * gridheight,marginheight,gridheight,barriercolor,barriercolor);
+						this.graphics.drawRect((i + 1)*gridwidth + (gridwidth - marginheight),(j + 1) * gridheight,marginheight,gridheight,barriercolor,barriercolor);
 					}
 
-					if(tmpmap.node.type == NodeType.e){
-						this.graphics.fillText("🦸",i*gridwidth + gridwidth / 2.0,j * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
+					if(i == x && j == y){
+						this.graphics.fillText("🦸",(i + 1)*gridwidth + gridwidth / 2.0,(j + 1) * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
 					}
 
 					if(tmpmap.node.type == NodeType.b){
-						this.graphics.fillText("👹",i*gridwidth + gridwidth / 2.0,j * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
+						this.graphics.fillText("👹",(i + 1)*gridwidth + gridwidth / 2.0,(j + 1) * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
 					}
 
 					if(tmpmap.node.type == NodeType.g){
-						this.graphics.fillText("👸",i*gridwidth + gridwidth / 2.0,j * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
+						this.graphics.fillText("👸",(i + 1)*gridwidth + gridwidth / 2.0,(j + 1) * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
 					}
 
 					if(tmpmap.node.type == NodeType.k){
-						this.graphics.fillText("🔑" + tmpmap.node.keyTo[0],i*gridwidth + gridwidth / 2.0,j * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
+						this.graphics.fillText("🔑" + tmpmap.node.keyTo[0],(i + 1)*gridwidth + gridwidth / 2.0,(j + 1) * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
 					}
 					if(tmpmap.node.type == NodeType.l){
-						this.graphics.fillText("🔒" + tmpmap.node.index,i*gridwidth + gridwidth / 2.0,j * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
+						this.graphics.fillText("🔒" + tmpmap.node.index,(i + 1)*gridwidth + gridwidth / 2.0,(j + 1) * gridheight + gridheight * 0.3,"20px Arial","#000000","center")
 					}
 				}
 			}
 		}
-    }
+	}
 }

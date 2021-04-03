@@ -18,8 +18,10 @@ P F7B6B7D7 clip_selectBox.png
 P 63A22FAC clip_tree_arrow.png
 P D749C312 clip_tree_folder.png
 P 704C5D70 combobox.png
+P EA1F0082 dialogue-bubble.png
 P D566AE8B fontClip.png
 P 38AB8F3F fontClip_num.png
+P AD269F6D heart.png
 P 6EF336AE hscroll$bar.png
 P 7FF47AC5 hscroll$down.png
 P 3D7B147A hscroll$up.png
@@ -37,6 +39,7 @@ P BA28BD65 img_blank.png
 P BA2A0579 label.png
 P 5EDC128C linkbutton.png
 P C451CE7B map-button.png
+P BA201BF2 number.png
 P B017E53E progress$bar.png
 P C05839CD progress.png
 P 3C493DD4 radio.png

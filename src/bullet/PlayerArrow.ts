@@ -16,16 +16,19 @@ export class PlayerArrow extends Laya.Script{
         }
     }
     onTriggerEnter(other:any){
-        let player = (other.owner as Laya.Node).getComponent(Player);
-        if(player){
-            console.log(true);
-        }else{
-            let character = (other.owner as Laya.Node).getComponent(Character);
-            if(character){
-                character.HP -= this.damage;
+        if(this.owner && other.owner){
+            let player = (other.owner as Laya.Node).getComponent(Player);
+            if(player){
+                console.log(true);
+            }else{
+                let character = (other.owner as Laya.Node).getComponent(Character);
+                if(character && !character.invincibleStatus){
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+                let owner = this.owner as Laya.Image;
+                this.removeOwner(owner);
             }
-            let owner = this.owner as Laya.Image;
-            this.removeOwner(owner);
         }
     }
     removeOwner(owner){

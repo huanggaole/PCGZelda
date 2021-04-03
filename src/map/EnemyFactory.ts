@@ -17,7 +17,7 @@ export default class EnemyFactory{
         EnemyFactory.enemylist = [];
     }
 
-    initEnemy(regiontype:RegionType,enemyforce:number){
+    initEnemy(regiontype:RegionType,enemyforce:number,battlemap:number[][]){
         let Enemies = [];
         if(regiontype == RegionType.Grass){
             Enemies = this.grassEnemies;
@@ -41,8 +41,19 @@ export default class EnemyFactory{
             fc.sheet = "一八匕厂 刀儿二几 力人入十 又川寸大";
             fc.scaleX = fc.scaleY = 3;
             fc.value = "一";
-            fc.x = 96 + Math.random() * 96 * 8;
-            fc.y = 96 + Math.random() * 96 * 3;
+            let xindex = Math.floor(Math.random() * 8);
+            let yindex = Math.floor(Math.random() * 3);
+            while(true){
+                if(battlemap[yindex + 1][xindex + 1] == 0){
+                    break;
+                }else{
+                    xindex = Math.floor(Math.random() * 8);
+                    yindex = Math.floor(Math.random() * 3);
+                }
+            }
+            
+            fc.x = 96 * (xindex + 1) + Math.floor(32 + Math.random() * 32);
+            fc.y = 96 * (yindex + 1) + Math.floor(32 + Math.random() * 32);
             let rigid = fc.getComponent(Laya.RigidBody);
             if(!rigid){
                 rigid = fc.addComponent(Laya.RigidBody) as Laya.RigidBody;
@@ -61,6 +72,16 @@ export default class EnemyFactory{
             }
             enemy = fc.addComponent(Enemy);
             enemy.HP = enemy.maxHP;
+            // 为enemy增加血条绘制Image
+            let hpbar = fc.getChildByName("hpbar") as Laya.Image;
+            if(!hpbar){
+                hpbar = new Laya.Image();
+                hpbar.name = "hpbar";
+                hpbar.y = -5;
+                fc.addChild(hpbar);
+            }
+            hpbar.graphics.drawRect(0, 0, 16, 4,"#000000");
+            hpbar.graphics.drawRect(1, 1, 14, 2, "#ff0000");
             EnemyFactory.enemylist.push(fc);
             EnemyFactory.mainsp.addChild(fc);
             enemyforce -= Enemy.BattlePoint;
