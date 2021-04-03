@@ -19,7 +19,7 @@ export class PlayerArrow extends Laya.Script{
         if(this.owner && other.owner){
             let player = (other.owner as Laya.Node).getComponent(Player);
             if(player){
-                console.log(true);
+                // console.log(true);
             }else{
                 let character = (other.owner as Laya.Node).getComponent(Character);
                 if(character && !character.invincibleStatus){

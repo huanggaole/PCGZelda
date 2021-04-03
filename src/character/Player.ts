@@ -3,6 +3,7 @@ import EnemyFactory from "../map/EnemyFactory";
 import BulletFactory from "../map/BulletFactory";
 import { PlayerArrow } from "../bullet/PlayerArrow";
 import BattleScene from "../scene/BattleScene";
+import { NodeType } from "../script/Node";
 export default class Player extends Character{
     static Level = 1;
     static exp = 0;
@@ -40,6 +41,21 @@ export default class Player extends Character{
                 let res = this.onAttackWait();
                 if(!res){
                     // EnemyFactory.clearEnemey();
+                    // 如果当前地图是一张锁的地图
+                    let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+                    if(tmpregion.node.type == NodeType.k){
+                        Laya.timer.once(500,this,()=>{
+                            alert("你获得了"+tmpregion.node.keyTo[0]+"号钥匙，"+tmpregion.node.keyTo[0]+"号关卡的守卫已经离开了！");
+                        })
+                        tmpregion.node.type = NodeType.t;
+                        for(let i = 0; i<BattleScene.regionmap.length;i++){
+                            for(let j = 0; j < BattleScene.regionmap[i].length;j++){
+                                if(BattleScene.regionmap[i][j] && BattleScene.regionmap[i][j].node.index == tmpregion.node.keyTo[0]){
+                                    BattleScene.regionmap[i][j].node.type = NodeType.t;
+                                }
+                            }
+                        }
+                    }
                     this.attacktick--;
                 }
             }else if(this.attacktick < this.attackInterval + this.attackPre){

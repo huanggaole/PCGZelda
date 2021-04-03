@@ -1330,7 +1330,6 @@
             if (this.owner && other.owner) {
                 let player = other.owner.getComponent(Player);
                 if (player) {
-                    console.log(true);
                 }
                 else {
                     let character = other.owner.getComponent(Character);
@@ -1404,6 +1403,18 @@
                 if (this.attacktick < this.attackInterval) {
                     let res = this.onAttackWait();
                     if (!res) {
+                        let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+                        if (tmpregion.node.type == NodeType.k) {
+                            alert("你获得了" + tmpregion.node.keyTo[0] + "号钥匙，" + tmpregion.node.keyTo[0] + "号关卡的守卫已经离开了！");
+                            tmpregion.node.type = NodeType.t;
+                            for (let i = 0; i < BattleScene.regionmap.length; i++) {
+                                for (let j = 0; j < BattleScene.regionmap[i].length; j++) {
+                                    if (BattleScene.regionmap[i][j] && BattleScene.regionmap[i][j].node.index == tmpregion.node.keyTo[0]) {
+                                        BattleScene.regionmap[i][j].node.type = NodeType.t;
+                                    }
+                                }
+                            }
+                        }
                         this.attacktick--;
                     }
                 }
@@ -1481,13 +1492,19 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                BattleScene.tmpMapY += 1;
-                BattleScene.switchMap(0, -400);
-                this.conce = false;
-                Laya.timer.once(500, this, () => { this.conce = true; });
+                if (toDown.keyindex == -1) {
+                    BattleScene.tmpMapY += 1;
+                    BattleScene.switchMap(0, -400);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toDown.keyindex + "号钥匙证明自己的实力！");
+                }
             }
         }
     }
+    toDown.keyindex = -1;
 
     class toUp extends Laya.Script {
         constructor() {
@@ -1497,13 +1514,19 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                BattleScene.tmpMapY -= 1;
-                BattleScene.switchMap(0, 400);
-                this.conce = false;
-                Laya.timer.once(500, this, () => { this.conce = true; });
+                if (toUp.keyindex == -1) {
+                    BattleScene.tmpMapY -= 1;
+                    BattleScene.switchMap(0, 400);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toUp.keyindex + "号钥匙证明自己的实力！");
+                }
             }
         }
     }
+    toUp.keyindex = -1;
 
     class toLeft extends Laya.Script {
         constructor() {
@@ -1513,13 +1536,19 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                BattleScene.tmpMapX -= 1;
-                BattleScene.switchMap(880, 0);
-                this.conce = false;
-                Laya.timer.once(500, this, () => { this.conce = true; });
+                if (toLeft.keyindex == -1) {
+                    BattleScene.tmpMapX -= 1;
+                    BattleScene.switchMap(880, 0);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toLeft.keyindex + "号钥匙证明自己的实力！");
+                }
             }
         }
     }
+    toLeft.keyindex = -1;
 
     class toRight extends Laya.Script {
         constructor() {
@@ -1529,13 +1558,19 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                BattleScene.tmpMapX += 1;
-                BattleScene.switchMap(-880, 0);
-                this.conce = false;
-                Laya.timer.once(500, this, () => { this.conce = true; });
+                if (toRight.keyindex == -1) {
+                    BattleScene.tmpMapX += 1;
+                    BattleScene.switchMap(-880, 0);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toRight.keyindex + "号钥匙证明自己的实力！");
+                }
             }
         }
     }
+    toRight.keyindex = -1;
 
     class BattleImage {
         constructor(battlesprite) {
@@ -1544,6 +1579,7 @@
             this.tilePool = [];
         }
         initMap(regiontype, battlemap, enemyforce) {
+            let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
             this.enemyFactory = new EnemyFactory(this.mainsp);
             this.bulletFactory = new BulletFactory(this.mainsp);
             console.log(this.mainsp.numChildren);
@@ -1553,6 +1589,38 @@
                 let u = c.getComponent(toUp);
                 let l = c.getComponent(toLeft);
                 let r = c.getComponent(toRight);
+                if (d) {
+                    toDown.keyindex = -1;
+                    c.visible = false;
+                    if (tmpregion.downConnect && BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.type == NodeType.l) {
+                        toDown.keyindex = BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.index;
+                        c.visible = true;
+                    }
+                }
+                if (u) {
+                    toUp.keyindex = -1;
+                    c.visible = false;
+                    if (tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.l) {
+                        toUp.keyindex = BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.index;
+                        c.visible = true;
+                    }
+                }
+                if (l) {
+                    toLeft.keyindex = -1;
+                    c.visible = false;
+                    if (tmpregion.leftConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.type == NodeType.l) {
+                        toLeft.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.index;
+                        c.visible = true;
+                    }
+                }
+                if (r) {
+                    toRight.keyindex = -1;
+                    c.visible = false;
+                    if (tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.l) {
+                        toRight.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.index;
+                        c.visible = true;
+                    }
+                }
                 if (d) {
                     d.conce = true;
                 }

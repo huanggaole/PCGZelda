@@ -7,6 +7,7 @@ import toDown from "../events/toDown";
 import toUp from "../events/toUp";
 import toLeft from "../events/toLeft";
 import toRight from "../events/toRight";
+import { NodeType } from "../script/Node";
 
 export default class BattleImage{
     tilePool:Laya.FontClip[][];
@@ -27,6 +28,7 @@ export default class BattleImage{
     }
 
     initMap(regiontype:RegionType,battlemap:number[][],enemyforce:number){
+        let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
         this.enemyFactory = new EnemyFactory(this.mainsp);
         this.bulletFactory = new BulletFactory(this.mainsp);
         console.log(this.mainsp.numChildren);
@@ -36,6 +38,40 @@ export default class BattleImage{
             let u = c.getComponent(toUp) as toUp;
             let l = c.getComponent(toLeft) as toLeft;
             let r = c.getComponent(toRight) as toRight;
+            
+            if(d){
+                toDown.keyindex = -1;
+                (c as Laya.Sprite).visible = false;
+                if(tmpregion.downConnect && BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.type == NodeType.l){
+                    toDown.keyindex = BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.index;
+                    (c as Laya.Sprite).visible = true;
+                }
+            }
+            if(u){
+                toUp.keyindex = -1;
+                (c as Laya.Sprite).visible = false;
+                if(tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.l){
+                    toUp.keyindex = BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.index;
+                    (c as Laya.Sprite).visible = true;
+                }
+            }
+            if(l){
+                toLeft.keyindex = -1;
+                (c as Laya.Sprite).visible = false;
+                if(tmpregion.leftConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.type == NodeType.l){
+                    toLeft.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.index;
+                    (c as Laya.Sprite).visible = true;
+                }
+            }
+            if(r){
+                toRight.keyindex = -1;
+                (c as Laya.Sprite).visible = false;
+                if(tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.l){
+                    toRight.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.index;
+                    (c as Laya.Sprite).visible = true;
+                }
+            }
+            
             if(d){
                 d.conce = true;
             }
@@ -110,6 +146,7 @@ export default class BattleImage{
         }
         // 将敌人添加到地图上
         this.enemyFactory.initEnemy(regiontype,enemyforce,battlemap);
+       
     }
 
     clearTiles(){
