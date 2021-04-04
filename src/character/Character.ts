@@ -113,8 +113,8 @@ export default class Character extends Laya.Script{
         this.y = 0.5 - Math.random();
         let mod = Math.sqrt(this.x * this.x + this.y * this.y);
         if(mod != 0){
-            this.x /= mod;
-            this.y /= mod;
+            this.dirx = this.x /= mod;
+            this.diry = this.y /= mod;
         }
     }
     addExp(){

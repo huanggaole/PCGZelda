@@ -821,6 +821,7 @@
                 bs = bl.addComponent(BulletScript);
             }
             bs = new BulletScript();
+            console.log(bl);
         }
     }
 
@@ -915,8 +916,8 @@
             this.y = 0.5 - Math.random();
             let mod = Math.sqrt(this.x * this.x + this.y * this.y);
             if (mod != 0) {
-                this.x /= mod;
-                this.y /= mod;
+                this.dirx = this.x /= mod;
+                this.diry = this.y /= mod;
             }
         }
         addExp() {
@@ -1228,9 +1229,141 @@
     LavaEnemy1.BattlePoint = 1;
     LavaEnemy1.skinname = "Enemy/19.png";
 
+    class BeanArrow extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                    if (player && !player.invincibleStatus) {
+                        player.hurtFrame = 20;
+                        player.HP -= this.damage;
+                    }
+                    let owner = this.owner;
+                    this.removeOwner(owner);
+                }
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character) {
+                    }
+                    else {
+                        let owner = this.owner;
+                        this.removeOwner(owner);
+                    }
+                }
+            }
+        }
+        removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
+            owner._destroyAllComponent();
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
+        }
+    }
+    BeanArrow.skin = "Bullet/Bean.png";
+    BeanArrow.scale = 2;
+    BeanArrow.width = 5;
+    BeanArrow.height = 5;
+    BeanArrow.speed = 5;
+
+    class GrassEnemy2 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 5;
+            this.damage = 1;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 2.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        addExp() {
+            super.addExp();
+            Player.exp += 2;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
+        doShoot() {
+            let owner = this.owner;
+            BulletFactory.initBullet(BeanArrow, owner.x, owner.y, this.dirx, this.diry);
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick % 30 == 0) {
+                    this.dirx = (BattleScene.player.x - this.owner.x);
+                    this.diry = (BattleScene.player.y - this.owner.y);
+                    let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                    this.dirx /= mod;
+                    this.diry /= mod;
+                    this.doShoot();
+                }
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 100) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
+    }
+    GrassEnemy2.BattlePoint = 3;
+    GrassEnemy2.skinname = "Enemy/4.png";
+
     class EnemyFactory {
         constructor(battlesprite) {
-            this.grassEnemies = [GrassEnemy1];
+            this.grassEnemies = [GrassEnemy1, GrassEnemy2];
             this.sandEnemies = [SandEnemy1];
             this.snowEnemies = [SnowEnemy1];
             this.lavaEnemies = [LavaEnemy1];
@@ -1357,6 +1490,7 @@
             if (rg) {
                 owner._destroyComponent(rg);
             }
+            owner._destroyAllComponent();
             BulletFactory.mainsp.removeChild(owner);
             Laya.Pool.recover('BulletType', owner);
         }
@@ -1405,7 +1539,9 @@
                     if (!res) {
                         let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
                         if (tmpregion.node.type == NodeType.k) {
-                            alert("你获得了" + tmpregion.node.keyTo[0] + "号钥匙，" + tmpregion.node.keyTo[0] + "号关卡的守卫已经离开了！");
+                            Laya.timer.once(500, this, () => {
+                                alert("你获得了" + tmpregion.node.keyTo[0] + "号钥匙，" + tmpregion.node.keyTo[0] + "号关卡的守卫已经离开了！");
+                            });
                             tmpregion.node.type = NodeType.t;
                             for (let i = 0; i < BattleScene.regionmap.length; i++) {
                                 for (let j = 0; j < BattleScene.regionmap[i].length; j++) {

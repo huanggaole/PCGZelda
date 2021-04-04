@@ -34,6 +34,7 @@ export class PlayerArrow extends Laya.Script{
     removeOwner(owner){
         let rg = owner.getComponent(Laya.RigidBody) as Laya.RigidBody;
         let bc = owner.getComponent(Laya.BoxCollider) as Laya.BoxCollider;
+
         if(rg){
             rg.enabled = false;
         }
@@ -46,6 +47,7 @@ export class PlayerArrow extends Laya.Script{
         if(rg){
             owner._destroyComponent(rg);
         }
+        (owner as Laya.Clip)._destroyAllComponent();
         BulletFactory.mainsp.removeChild(owner);
         Laya.Pool.recover('BulletType',owner);
     }

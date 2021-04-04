@@ -47,5 +47,6 @@ export default class BulletFactory{
             bs = bl.addComponent(BulletScript);    
         }
         bs = new BulletScript();
+        console.log(bl);
     }
 }

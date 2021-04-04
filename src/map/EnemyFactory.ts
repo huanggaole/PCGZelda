@@ -3,11 +3,12 @@ import GrassEnemy1 from "../character/GrassEnemy1";
 import SandEnemy1 from "../character/SandEnemy1";
 import SnowEnemy1 from "../character/SnowEnemy1";
 import LavaEnemy1 from "../character/LavaEnemy1";
+import GrassEnemy2 from "../character/GrassEnemy2";
 
 export default class EnemyFactory{
     static mainsp:Laya.Sprite;
     static enemylist:Laya.FontClip[];
-    grassEnemies = [GrassEnemy1];
+    grassEnemies = [GrassEnemy1, GrassEnemy2];
     sandEnemies = [SandEnemy1];
     snowEnemies = [SnowEnemy1];
     lavaEnemies = [LavaEnemy1];
