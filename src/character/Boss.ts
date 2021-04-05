@@ -4,6 +4,10 @@ import BattleScene from "../scene/BattleScene"
 import BulletFactory from "../map/BulletFactory";
 import { IceArrow } from "../bullet/IceArrow";
 import { NodeType } from "../script/Node";
+import toUp from "../events/toUp";
+import toDown from "../events/toDown";
+import toLeft from "../events/toLeft";
+import toRight from "../events/toRight";
 
 export default class SnowEnemy2 extends Character{
     static BattlePoint = 100;
@@ -28,6 +32,10 @@ export default class SnowEnemy2 extends Character{
         super.onUpdate();
         if(this.HP <= 0){
             BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX].node.type = NodeType.e;
+            toUp.keyindex = -1;
+            toDown.keyindex = -1;
+            toLeft.keyindex = -1;
+            toRight.keyindex = -1;
         }
         this.AI();
     }

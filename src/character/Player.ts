@@ -35,7 +35,7 @@ export default class Player extends Character{
             }
         }
         if(this.HP <= 0 && this.hurtFrame == 0){
-            alert("你失败了！游戏结束……");
+            alert("你失败了！要看广告后复活吗？");
         }
         if(this.x == 0 && this.y == 0){
             this.attacktick++;

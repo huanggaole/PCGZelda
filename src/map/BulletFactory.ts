@@ -8,6 +8,12 @@ export default class BulletFactory{
     static initBullet(BulletScript,x:number,y:number,dirx:number,diry:number){
 
         let bl = Laya.Pool.getItemByClass('BulletType',Laya.Image) as Laya.Image;
+        let comps = bl.getComponents(Laya.Script);
+        if(comps){
+            for(let i = 0; i < comps.length; i++){
+                bl._destroyComponent(comps[i]);
+            }
+        }
         
         bl.skin = BulletScript.skin;
         
@@ -53,6 +59,9 @@ export default class BulletFactory{
 
     static clearBullet(){
         for(let i = 0; i < BulletFactory.bulletlist.length; i++){
+
+            // BulletFactory.bulletlist[i].removeOwner(BulletFactory.bulletlist[i].owner);
+            
             Laya.Pool.recover('BulletType',BulletFactory.bulletlist[i]);
             this.mainsp.removeChild(BulletFactory.bulletlist[i]);
         }

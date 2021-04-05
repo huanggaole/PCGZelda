@@ -833,6 +833,12 @@
         }
         static initBullet(BulletScript, x, y, dirx, diry) {
             let bl = Laya.Pool.getItemByClass('BulletType', Laya.Image);
+            let comps = bl.getComponents(Laya.Script);
+            if (comps) {
+                for (let i = 0; i < comps.length; i++) {
+                    bl._destroyComponent(comps[i]);
+                }
+            }
             bl.skin = BulletScript.skin;
             let rot = 0;
             if (dirx == 0) {
@@ -1714,6 +1720,106 @@
     SandEnemy2.BattlePoint = 3;
     SandEnemy2.skinname = "Enemy/1.png";
 
+    class toUp extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                if (toUp.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toUp.keyindex == -1) {
+                    BattleScene.tmpMapY -= 1;
+                    BattleScene.switchMap(0, 400);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toUp.keyindex + "号钥匙证明自己的实力！");
+                }
+            }
+        }
+    }
+    toUp.keyindex = -1;
+
+    class toDown extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                if (toDown.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toDown.keyindex == -1) {
+                    BattleScene.tmpMapY += 1;
+                    BattleScene.switchMap(0, -400);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toDown.keyindex + "号钥匙证明自己的实力！");
+                }
+            }
+        }
+    }
+    toDown.keyindex = -1;
+
+    class toLeft extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                if (toLeft.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toLeft.keyindex == -1) {
+                    BattleScene.tmpMapX -= 1;
+                    BattleScene.switchMap(880, 0);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toLeft.keyindex + "号钥匙证明自己的实力！");
+                }
+            }
+        }
+    }
+    toLeft.keyindex = -1;
+
+    class toRight extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.conce = true;
+        }
+        onTriggerEnter(other) {
+            console.log("conce", this.conce);
+            if (other.owner.getComponent(Player) && this.conce) {
+                if (toRight.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toRight.keyindex == -1) {
+                    BattleScene.tmpMapX += 1;
+                    BattleScene.switchMap(-880, 0);
+                    this.conce = false;
+                    Laya.timer.once(500, this, () => { this.conce = true; });
+                }
+                else {
+                    alert("想要通过这里继续前进，你必须想首先办法获得" + toRight.keyindex + "号钥匙证明自己的实力！");
+                }
+            }
+        }
+    }
+    toRight.keyindex = -1;
+
     class SnowEnemy2$1 extends Character {
         constructor() {
             super(...arguments);
@@ -1736,6 +1842,10 @@
             super.onUpdate();
             if (this.HP <= 0) {
                 BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX].node.type = NodeType.e;
+                toUp.keyindex = -1;
+                toDown.keyindex = -1;
+                toLeft.keyindex = -1;
+                toRight.keyindex = -1;
             }
             this.AI();
         }
@@ -2036,7 +2146,7 @@
                 }
             }
             if (this.HP <= 0 && this.hurtFrame == 0) {
-                alert("你失败了！游戏结束……");
+                alert("你失败了！要看广告后复活吗？");
             }
             if (this.x == 0 && this.y == 0) {
                 this.attacktick++;
@@ -2129,106 +2239,6 @@
     Player.Level = 1;
     Player.exp = 0;
     Player.maxExp = 10;
-
-    class toDown extends Laya.Script {
-        constructor() {
-            super(...arguments);
-            this.conce = true;
-        }
-        onTriggerEnter(other) {
-            console.log("conce", this.conce);
-            if (other.owner.getComponent(Player) && this.conce) {
-                if (toDown.keyindex == -2) {
-                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
-                }
-                else if (toDown.keyindex == -1) {
-                    BattleScene.tmpMapY += 1;
-                    BattleScene.switchMap(0, -400);
-                    this.conce = false;
-                    Laya.timer.once(500, this, () => { this.conce = true; });
-                }
-                else {
-                    alert("想要通过这里继续前进，你必须想首先办法获得" + toDown.keyindex + "号钥匙证明自己的实力！");
-                }
-            }
-        }
-    }
-    toDown.keyindex = -1;
-
-    class toUp extends Laya.Script {
-        constructor() {
-            super(...arguments);
-            this.conce = true;
-        }
-        onTriggerEnter(other) {
-            console.log("conce", this.conce);
-            if (other.owner.getComponent(Player) && this.conce) {
-                if (toUp.keyindex == -2) {
-                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
-                }
-                else if (toUp.keyindex == -1) {
-                    BattleScene.tmpMapY -= 1;
-                    BattleScene.switchMap(0, 400);
-                    this.conce = false;
-                    Laya.timer.once(500, this, () => { this.conce = true; });
-                }
-                else {
-                    alert("想要通过这里继续前进，你必须想首先办法获得" + toUp.keyindex + "号钥匙证明自己的实力！");
-                }
-            }
-        }
-    }
-    toUp.keyindex = -1;
-
-    class toLeft extends Laya.Script {
-        constructor() {
-            super(...arguments);
-            this.conce = true;
-        }
-        onTriggerEnter(other) {
-            console.log("conce", this.conce);
-            if (other.owner.getComponent(Player) && this.conce) {
-                if (toLeft.keyindex == -2) {
-                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
-                }
-                else if (toLeft.keyindex == -1) {
-                    BattleScene.tmpMapX -= 1;
-                    BattleScene.switchMap(880, 0);
-                    this.conce = false;
-                    Laya.timer.once(500, this, () => { this.conce = true; });
-                }
-                else {
-                    alert("想要通过这里继续前进，你必须想首先办法获得" + toLeft.keyindex + "号钥匙证明自己的实力！");
-                }
-            }
-        }
-    }
-    toLeft.keyindex = -1;
-
-    class toRight extends Laya.Script {
-        constructor() {
-            super(...arguments);
-            this.conce = true;
-        }
-        onTriggerEnter(other) {
-            console.log("conce", this.conce);
-            if (other.owner.getComponent(Player) && this.conce) {
-                if (toRight.keyindex == -2) {
-                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
-                }
-                else if (toRight.keyindex == -1) {
-                    BattleScene.tmpMapX += 1;
-                    BattleScene.switchMap(-880, 0);
-                    this.conce = false;
-                    Laya.timer.once(500, this, () => { this.conce = true; });
-                }
-                else {
-                    alert("想要通过这里继续前进，你必须想首先办法获得" + toRight.keyindex + "号钥匙证明自己的实力！");
-                }
-            }
-        }
-    }
-    toRight.keyindex = -1;
 
     class BattleImage {
         constructor(battlesprite) {
