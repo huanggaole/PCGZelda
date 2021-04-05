@@ -7,7 +7,9 @@ export default class toDown extends Laya.Script{
     onTriggerEnter(other){
         console.log("conce",this.conce);
         if(other.owner.getComponent(Player) && this.conce){
-            if(toDown.keyindex == -1){
+            if(toDown.keyindex == -2){
+                alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+            }else if(toDown.keyindex == -1){
                 BattleScene.tmpMapY += 1;
                 BattleScene.switchMap(0, -400);
                 this.conce = false;

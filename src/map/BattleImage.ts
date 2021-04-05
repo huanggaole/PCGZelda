@@ -45,6 +45,8 @@ export default class BattleImage{
                 if(tmpregion.downConnect && BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.type == NodeType.l){
                     toDown.keyindex = BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.index;
                     (c as Laya.Sprite).visible = true;
+                }else if(tmpregion.downConnect && BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.type == NodeType.g){
+                    toDown.keyindex = -2;
                 }
             }
             if(u){
@@ -53,6 +55,8 @@ export default class BattleImage{
                 if(tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.l){
                     toUp.keyindex = BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.index;
                     (c as Laya.Sprite).visible = true;
+                }else if(tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.g){
+                    toUp.keyindex = -2;
                 }
             }
             if(l){
@@ -61,6 +65,8 @@ export default class BattleImage{
                 if(tmpregion.leftConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.type == NodeType.l){
                     toLeft.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.index;
                     (c as Laya.Sprite).visible = true;
+                }else if(tmpregion.leftConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.type == NodeType.g){
+                    toLeft.keyindex = -2;
                 }
             }
             if(r){
@@ -69,6 +75,8 @@ export default class BattleImage{
                 if(tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.l){
                     toRight.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.index;
                     (c as Laya.Sprite).visible = true;
+                }else if(tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.g){
+                    toRight.keyindex = -2;
                 }
             }
             
@@ -145,8 +153,13 @@ export default class BattleImage{
             }
         }
         // 将敌人添加到地图上
-        this.enemyFactory.initEnemy(regiontype,enemyforce,battlemap);
-       
+        if(tmpregion.node.type == NodeType.b){
+            this.enemyFactory.initBoss(battlemap);
+        }else if(tmpregion.node.type == NodeType.g){
+
+        }else{
+            this.enemyFactory.initEnemy(regiontype,enemyforce,battlemap);
+        }
     }
 
     clearTiles(){

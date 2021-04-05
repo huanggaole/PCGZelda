@@ -395,7 +395,7 @@
             let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.startpre);
             let match = MatchRes[0];
             GraphOperations.changeOriG(oriG, Rules.startpre, Rules.startnew, match);
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 6; i++) {
                 let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.addpre);
                 let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
                 if (Math.random() < 0.5) {
@@ -425,7 +425,7 @@
                     GraphOperations.changeOriG(oriG, Rules.addpre, Rules.defineT2new, match);
                 }
             }
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 5; i++) {
                 let MatchRes = GraphOperations.FindLs(oriG);
                 if (MatchRes.length == 0) {
                     break;
@@ -870,9 +870,17 @@
                 bs = bl.addComponent(BulletScript);
             }
             bs = new BulletScript();
-            console.log(bl);
+            BulletFactory.bulletlist.push(bl);
+        }
+        static clearBullet() {
+            for (let i = 0; i < BulletFactory.bulletlist.length; i++) {
+                Laya.Pool.recover('BulletType', BulletFactory.bulletlist[i]);
+                this.mainsp.removeChild(BulletFactory.bulletlist[i]);
+            }
+            BulletFactory.bulletlist = [];
         }
     }
+    BulletFactory.bulletlist = [];
 
     var CharacterAction;
     (function (CharacterAction) {
@@ -1377,6 +1385,7 @@
                     let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
                     this.dirx /= mod;
                     this.diry /= mod;
+                    this.doTurnAround();
                     this.doShoot();
                 }
                 if (this.AItick == 100) {
@@ -1410,14 +1419,460 @@
     GrassEnemy2.BattlePoint = 3;
     GrassEnemy2.skinname = "Enemy/4.png";
 
+    class IceArrow extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let bullet = other.owner.getComponent(IceArrow);
+                if (bullet) {
+                    return;
+                }
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                    if (player && !player.invincibleStatus) {
+                        player.hurtFrame = 20;
+                        player.HP -= this.damage;
+                    }
+                    let owner = this.owner;
+                    this.removeOwner(owner);
+                }
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character) {
+                    }
+                    else {
+                        let owner = this.owner;
+                        this.removeOwner(owner);
+                    }
+                }
+            }
+        }
+        removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
+            owner._destroyAllComponent();
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
+        }
+    }
+    IceArrow.skin = "Bullet/Ice.png";
+    IceArrow.scale = 2;
+    IceArrow.width = 5;
+    IceArrow.height = 5;
+    IceArrow.speed = 5;
+
+    class SnowEnemy2 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 5;
+            this.damage = 1;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 2.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        addExp() {
+            super.addExp();
+            Player.exp += 5;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
+        doShoot() {
+            let owner = this.owner;
+            BulletFactory.initBullet(IceArrow, owner.x, owner.y, this.dirx, this.diry);
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick == 30) {
+                    this.dirx = (BattleScene.player.x - this.owner.x);
+                    this.diry = (BattleScene.player.y - this.owner.y);
+                    let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                    this.dirx /= mod;
+                    this.diry /= mod;
+                    this.doTurnAround();
+                    this.doShoot();
+                    let orix = this.dirx;
+                    let oriy = this.diry;
+                    let alpha = Math.PI * 30 / 180;
+                    this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                    this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                    mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                    this.dirx /= mod;
+                    this.diry /= mod;
+                    this.doShoot();
+                    alpha = -Math.PI * 30 / 180;
+                    this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                    this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                    mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                    this.dirx /= mod;
+                    this.diry /= mod;
+                    this.doShoot();
+                }
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 100) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
+    }
+    SnowEnemy2.BattlePoint = 3;
+    SnowEnemy2.skinname = "Enemy/17.png";
+
+    class FireArrow extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let bullet = other.owner.getComponent(FireArrow);
+                let owner = this.owner;
+                if (bullet) {
+                    return;
+                }
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                    if (player && !player.invincibleStatus) {
+                        player.hurtFrame = 20;
+                        player.HP -= this.damage;
+                    }
+                    this.removeOwner(owner);
+                }
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character) {
+                    }
+                    else {
+                        let rb = owner.getComponent(Laya.RigidBody);
+                        if (owner.y < other.owner.y || owner.y > other.owner.y + other.owner.height - 5) {
+                            rb.setVelocity({ x: -rb.linearVelocity.x, y: rb.linearVelocity.y });
+                        }
+                        else {
+                            rb.setVelocity({ x: rb.linearVelocity.x, y: -rb.linearVelocity.y });
+                        }
+                    }
+                }
+            }
+        }
+        removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
+            owner._destroyAllComponent();
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
+        }
+    }
+    FireArrow.skin = "Bullet/Fire.png";
+    FireArrow.scale = 2;
+    FireArrow.width = 8;
+    FireArrow.height = 5;
+    FireArrow.speed = 5;
+
+    class SandEnemy2 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 5;
+            this.damage = 1;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 2.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            this.AI();
+        }
+        addExp() {
+            super.addExp();
+            Player.exp += 5;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
+        doShoot() {
+            let owner = this.owner;
+            BulletFactory.initBullet(FireArrow, owner.x, owner.y, this.dirx, this.diry);
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                if (this.AItick == 30) {
+                    this.doShoot();
+                }
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 100) {
+                this.onStopMove();
+                this.dirx = (BattleScene.player.x - this.owner.x);
+                this.diry = (BattleScene.player.y - this.owner.y);
+                let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                this.dirx /= mod;
+                this.diry /= mod;
+                this.doTurnAround();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
+    }
+    SandEnemy2.BattlePoint = 3;
+    SandEnemy2.skinname = "Enemy/1.png";
+
+    class SnowEnemy2$1 extends Character {
+        constructor() {
+            super(...arguments);
+            this.AItick = 0;
+            this.maxHP = 100;
+            this.damage = 1;
+        }
+        onStart() {
+            this.x = 0;
+            this.y = 0;
+            this.speed = 3.0;
+            this.frame = 0;
+            this.AItick = 0;
+            this.stepindex = 0;
+            this.directindex = 0;
+            this.action == CharacterAction.RandomWalk;
+            this.rigidbody = this.owner.getComponent(Laya.RigidBody);
+        }
+        onUpdate() {
+            super.onUpdate();
+            if (this.HP <= 0) {
+                BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX].node.type = NodeType.e;
+            }
+            this.AI();
+        }
+        addExp() {
+            super.addExp();
+            Player.exp += 0;
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        }
+        doShoot() {
+            let owner = this.owner;
+            BulletFactory.initBullet(IceArrow, owner.x, owner.y, this.dirx, this.diry);
+        }
+        AI() {
+            this.AItick++;
+            if (this.action == CharacterAction.Attack) {
+                let skillidx = Math.floor(Math.random() * 2);
+                if (skillidx == 0) {
+                    if (this.AItick == 30) {
+                        this.dirx = (BattleScene.player.x - this.owner.x);
+                        this.diry = (BattleScene.player.y - this.owner.y);
+                        let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                        this.dirx /= mod;
+                        this.diry /= mod;
+                        let orix = this.dirx;
+                        let oriy = this.diry;
+                        for (let i = 0; i < 360; i += 30) {
+                            let alpha = Math.PI * i / 180;
+                            this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                            this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                            mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                            this.dirx /= mod;
+                            this.diry /= mod;
+                            this.doShoot();
+                        }
+                    }
+                }
+                else if (skillidx == 1) {
+                    this.dirx = (BattleScene.player.x - this.owner.x);
+                    this.diry = (BattleScene.player.y - this.owner.y);
+                    let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                    this.dirx /= mod;
+                    this.diry /= mod;
+                    let orix = this.dirx;
+                    let oriy = this.diry;
+                    for (let i = 0; i < 360; i += 30) {
+                        let alpha = Math.PI * i / 180;
+                        this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                        this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                        mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                        this.dirx /= mod;
+                        this.diry /= mod;
+                        if (this.AItick == (i / 10) * 3) {
+                            this.doTurnAround();
+                            this.doShoot();
+                        }
+                    }
+                }
+                if (this.AItick == 100) {
+                    this.AItick = 0;
+                    this.action = CharacterAction.RandomWalk;
+                }
+                return;
+            }
+            if (this.AItick >= 100) {
+                this.onStopMove();
+                this.AItick = 0;
+                this.action = CharacterAction.Attack;
+            }
+            else {
+                if (Math.random() < 0.05) {
+                    this.onSetRandomWalk();
+                }
+            }
+            this.doMove();
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let character = other.owner.getComponent(Player);
+                if (character && !character.invincibleStatus) {
+                    character.hurtFrame = 20;
+                    character.HP -= this.damage;
+                }
+            }
+        }
+    }
+    SnowEnemy2$1.BattlePoint = 100;
+    SnowEnemy2$1.skinname = "Enemy/8.png";
+
     class EnemyFactory {
         constructor(battlesprite) {
             this.grassEnemies = [GrassEnemy1, GrassEnemy2];
-            this.sandEnemies = [SandEnemy1];
-            this.snowEnemies = [SnowEnemy1];
+            this.sandEnemies = [SandEnemy1, SandEnemy2];
+            this.snowEnemies = [SnowEnemy1, SnowEnemy2];
             this.lavaEnemies = [LavaEnemy1];
             EnemyFactory.mainsp = battlesprite;
             EnemyFactory.enemylist = [];
+        }
+        initBoss(battlemap) {
+            let Enemies = [];
+            let fc = Laya.Pool.getItemByClass('EnemyType', Laya.FontClip);
+            fc.skin = SnowEnemy2$1.skinname;
+            fc.sheet = "一八匕厂 刀儿二几 力人入十 又川寸大";
+            fc.scaleX = fc.scaleY = 3;
+            fc.value = "一";
+            let xindex = 3;
+            let yindex = 1;
+            fc.x = 96 * (xindex + 1) + Math.floor(32 + Math.random() * 32);
+            fc.y = 96 * (yindex + 1) + Math.floor(32 + Math.random() * 32);
+            let rigid = fc.getComponent(Laya.RigidBody);
+            if (!rigid) {
+                rigid = fc.addComponent(Laya.RigidBody);
+            }
+            rigid.type = "dynamic";
+            rigid.gravityScale = 0;
+            rigid.allowRotation = false;
+            let collider = fc.getComponent(Laya.BoxCollider);
+            if (!collider) {
+                collider = fc.addComponent(Laya.BoxCollider);
+            }
+            collider.width = collider.height = 16;
+            let enemy = fc.getComponent(Laya.Script);
+            if (enemy) {
+                fc._destroyComponent(enemy);
+            }
+            enemy = fc.addComponent(SnowEnemy2$1);
+            enemy.HP = enemy.maxHP;
+            let hpbar = fc.getChildByName("hpbar");
+            if (!hpbar) {
+                hpbar = new Laya.Image();
+                hpbar.name = "hpbar";
+                hpbar.y = -5;
+                fc.addChild(hpbar);
+            }
+            hpbar.graphics.drawRect(0, 0, 16, 4, "#000000");
+            hpbar.graphics.drawRect(1, 1, 14, 2, "#ff0000");
+            EnemyFactory.enemylist.push(fc);
+            EnemyFactory.mainsp.addChild(fc);
         }
         initEnemy(regiontype, enemyforce, battlemap) {
             let Enemies = [];
@@ -1559,6 +2014,9 @@
             this.attackAft = 5;
         }
         onUpdate() {
+            if (this.HP <= 0 && this.hurtFrame == 0) {
+                this.HP = 12;
+            }
             super.onUpdate();
             for (let i = 0; i < BattleScene.hearts.length; i++) {
                 if (this.maxHP / 4.0 <= i) {
@@ -1576,6 +2034,9 @@
                         BattleScene.hearts[i].index = Math.round(4 - (this.HP / 4.0 - i) * 4);
                     }
                 }
+            }
+            if (this.HP <= 0 && this.hurtFrame == 0) {
+                alert("你失败了！游戏结束……");
             }
             if (this.x == 0 && this.y == 0) {
                 this.attacktick++;
@@ -1677,7 +2138,10 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                if (toDown.keyindex == -1) {
+                if (toDown.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toDown.keyindex == -1) {
                     BattleScene.tmpMapY += 1;
                     BattleScene.switchMap(0, -400);
                     this.conce = false;
@@ -1699,7 +2163,10 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                if (toUp.keyindex == -1) {
+                if (toUp.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toUp.keyindex == -1) {
                     BattleScene.tmpMapY -= 1;
                     BattleScene.switchMap(0, 400);
                     this.conce = false;
@@ -1721,7 +2188,10 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                if (toLeft.keyindex == -1) {
+                if (toLeft.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toLeft.keyindex == -1) {
                     BattleScene.tmpMapX -= 1;
                     BattleScene.switchMap(880, 0);
                     this.conce = false;
@@ -1743,7 +2213,10 @@
         onTriggerEnter(other) {
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
-                if (toRight.keyindex == -1) {
+                if (toRight.keyindex == -2) {
+                    alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+                }
+                else if (toRight.keyindex == -1) {
                     BattleScene.tmpMapX += 1;
                     BattleScene.switchMap(-880, 0);
                     this.conce = false;
@@ -1781,6 +2254,9 @@
                         toDown.keyindex = BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.index;
                         c.visible = true;
                     }
+                    else if (tmpregion.downConnect && BattleScene.regionmap[BattleScene.tmpMapY + 1][BattleScene.tmpMapX].node.type == NodeType.g) {
+                        toDown.keyindex = -2;
+                    }
                 }
                 if (u) {
                     toUp.keyindex = -1;
@@ -1788,6 +2264,9 @@
                     if (tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.l) {
                         toUp.keyindex = BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.index;
                         c.visible = true;
+                    }
+                    else if (tmpregion.upConnect && BattleScene.regionmap[BattleScene.tmpMapY - 1][BattleScene.tmpMapX].node.type == NodeType.g) {
+                        toUp.keyindex = -2;
                     }
                 }
                 if (l) {
@@ -1797,6 +2276,9 @@
                         toLeft.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.index;
                         c.visible = true;
                     }
+                    else if (tmpregion.leftConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX - 1].node.type == NodeType.g) {
+                        toLeft.keyindex = -2;
+                    }
                 }
                 if (r) {
                     toRight.keyindex = -1;
@@ -1804,6 +2286,9 @@
                     if (tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.l) {
                         toRight.keyindex = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.index;
                         c.visible = true;
+                    }
+                    else if (tmpregion.rightConnect && BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX + 1].node.type == NodeType.g) {
+                        toRight.keyindex = -2;
                     }
                 }
                 if (d) {
@@ -1873,7 +2358,14 @@
                     }
                 }
             }
-            this.enemyFactory.initEnemy(regiontype, enemyforce, battlemap);
+            if (tmpregion.node.type == NodeType.b) {
+                this.enemyFactory.initBoss(battlemap);
+            }
+            else if (tmpregion.node.type == NodeType.g) {
+            }
+            else {
+                this.enemyFactory.initEnemy(regiontype, enemyforce, battlemap);
+            }
         }
         clearTiles() {
             for (let j = 0; j < 5; j++) {
@@ -1911,8 +2403,14 @@
             for (let j = 0; j < regionmap.length; j++) {
                 for (let i = 0; i < regionmap[0].length; i++) {
                     if (regionmap[j][i] && regionmap[j][i].node.type == NodeType.e) {
+                        regionmap[j][i].tileArray[2][4] = 0;
+                        regionmap[j][i].tileArray[2][5] = 0;
                         BattleScene.tmpMapX = i;
                         BattleScene.tmpMapY = j;
+                    }
+                    if (regionmap[j][i] && (regionmap[j][i].node.type == NodeType.b || regionmap[j][i].node.type == NodeType.g)) {
+                        regionmap[j][i].tileArray[2][4] = 0;
+                        regionmap[j][i].tileArray[2][5] = 0;
                     }
                 }
             }
@@ -1934,6 +2432,7 @@
             playercontroller.maxHP = 12;
             playercontroller.HP = 12;
             BattleScene.player = this.player;
+            BattleScene.princess = this.princess;
             BattleScene.MapImage = new Smallthis(BattleScene.regionmap);
             BattleScene.MapImage.visible = false;
             this.addChild(BattleScene.MapImage);
@@ -1957,6 +2456,7 @@
             let preindex = BattleScene.battleindex;
             let nowindex = BattleScene.battleindex = 1 - BattleScene.battleindex;
             EnemyFactory.clearEnemey();
+            BulletFactory.clearBullet();
             BattleScene.battleimagedeal[preindex].clearTiles();
             BattleScene.battleimagedeal[preindex].mainsp.removeChild(BattleScene.player);
             BattleScene.battleimagedeal[preindex].mainsp.x = -2000;
@@ -1967,6 +2467,10 @@
             console.log(BattleScene.player);
             BattleScene.battleimagedeal[nowindex].mainsp.addChild(BattleScene.player);
             BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
+            if (tmpregion.node.type == NodeType.g) {
+                this.princess.visible = true;
+                Laya.timer.once(500, this, () => { alert("恭喜你！成功救出了公主！点击确定重新开始游戏。"); location.reload(); });
+            }
         }
     }
     BattleScene.battleindex = 0;

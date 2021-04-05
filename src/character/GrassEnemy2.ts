@@ -48,6 +48,7 @@ export default class GrassEnemy2 extends Character{
                 let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
                 this.dirx /= mod;
                 this.diry /= mod;
+                this.doTurnAround();
                 this.doShoot();
             }
             if(this.AItick == 100){

@@ -16,7 +16,7 @@ export default class Map{
 		let match = MatchRes[0];
 		GraphOperations.changeOriG(oriG, Rules.startpre, Rules.startnew, match);
 		// 添加任务 * 6
-		for(let i = 0; i < 12; i ++){
+		for(let i = 0; i < 6; i ++){
 			let MatchRes = GraphOperations.FindSubGraph(oriG, Rules.addpre);
 			// console.log(MatchRes);
 			let match = MatchRes[Math.floor(Math.random() * MatchRes.length)];
@@ -50,7 +50,7 @@ export default class Map{
 			}
 		}
 		// 移动锁 * 5
-		for(let i = 0; i < 10; i++){
+		for(let i = 0; i < 5; i++){
 			let MatchRes = GraphOperations.FindLs(oriG);
 			if(MatchRes.length == 0){
 				break;

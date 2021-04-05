@@ -15,6 +15,9 @@ export default class Player extends Character{
     attackAft = 5;
 
     onUpdate(){
+        if(this.HP <= 0 && this.hurtFrame == 0){
+            this.HP = 12;
+        }
         super.onUpdate();
         // 刷新HP的显示
         for(let i = 0; i < BattleScene.hearts.length; i++){
@@ -30,7 +33,10 @@ export default class Player extends Character{
                     BattleScene.hearts[i].index = Math.round(4 - (this.HP / 4.0 - i) * 4);
                 }
             }
-        }  
+        }
+        if(this.HP <= 0 && this.hurtFrame == 0){
+            alert("你失败了！游戏结束……");
+        }
         if(this.x == 0 && this.y == 0){
             this.attacktick++;
             if(this.action != CharacterAction.Attack){

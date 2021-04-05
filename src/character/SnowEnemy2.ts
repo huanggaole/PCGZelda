@@ -2,11 +2,11 @@ import Character, { CharacterAction } from "./Character"
 import Player from "./Player";
 import BattleScene from "../scene/BattleScene"
 import BulletFactory from "../map/BulletFactory";
-import { BeanArrow } from "../bullet/BeanArrow";
-import { PlayerArrow } from "../bullet/PlayerArrow";
+import { IceArrow } from "../bullet/IceArrow";
+
 export default class SnowEnemy2 extends Character{
     static BattlePoint = 3;
-    static skinname = "Enemy/4.png";
+    static skinname = "Enemy/17.png";
     AItick = 0;
     maxHP = 5;
     damage = 1;
@@ -36,20 +36,38 @@ export default class SnowEnemy2 extends Character{
 
     doShoot(){
         let owner = this.owner as Laya.FontClip;
-        BulletFactory.initBullet(BeanArrow,owner.x, owner.y, this.dirx,this.diry);
+        BulletFactory.initBullet(IceArrow,owner.x, owner.y, this.dirx,this.diry);
     }
 
     AI(){
         this.AItick++;
         if(this.action == CharacterAction.Attack){
-            if(this.AItick % 30 == 0){
+            if(this.AItick == 30){
                 this.dirx = (BattleScene.player.x - (this.owner as Laya.Clip).x);
                 this.diry = (BattleScene.player.y - (this.owner as Laya.Clip).y);
                 let mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
                 this.dirx /= mod;
                 this.diry /= mod;
+                this.doTurnAround();
+                this.doShoot();
+                let orix = this.dirx;
+                let oriy = this.diry;
+                let alpha = Math.PI * 30 / 180;
+                this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                this.dirx /= mod;
+                this.diry /= mod;
+                this.doShoot();
+                alpha = -Math.PI * 30 / 180;
+                this.dirx = orix * Math.cos(alpha) - oriy * Math.sin(alpha);
+                this.diry = orix * Math.sin(alpha) + oriy * Math.cos(alpha);
+                mod = Math.sqrt(this.dirx * this.dirx + this.diry * this.diry);
+                this.dirx /= mod;
+                this.diry /= mod;
                 this.doShoot();
             }
+            
             if(this.AItick == 100){
                 this.AItick = 0;
                 this.action = CharacterAction.RandomWalk;

@@ -8,6 +8,8 @@ R 8FC4D1F1 SnowLand.png
 D Bullet
 P D7F38ACD arrow.png
 P 8DC74610 Bean.png
+P 84A71699 Fire.png
+P 852DA78C Ice.png
 D comp
 P 9401CC40 blank.png
 P 316AD948 btn_close.png
@@ -80,6 +82,7 @@ P 4B98DB64 8.png
 P 224AFCBF 9.png
 D Player
 P D1F7EF71 15.png
+P FDC3B1B3 17.png
 P 42BB2E07 18-d.png
 P ACE49CE0 18-l.png
 P EFA9BEC4 18-r.png

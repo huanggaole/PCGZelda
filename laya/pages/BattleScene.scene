@@ -1,12 +1,12 @@
 {
     "x":0,
     "type":"Scene",
-    "selectedBox":73,
-    "selecteID":109,
+    "selectedBox":2,
+    "selecteID":111,
     "searchKey":"Scene",
     "props":{"width":960,"sceneColor":"#000000","height":640},
     "nodeParent":-1,
-    "maxID":111,
+    "maxID":115,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -831,6 +831,21 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":98,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"FontClip",
+            "searchKey":"FontClip,princess",
+            "props":{"zOrder":2,"y":304,"x":464,"visible":false,"var":"princess","value":"一","skin":"Player/17.png","sheet":"一八匕厂 刀儿二几 力人入十 又川寸大 飞干工弓 广己口马 门女山尸","scaleY":3,"scaleX":3},
+            "nodeParent":2,
+            "label":"princess",
+            "isOpen":true,
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":111,
             "child":[
                 ]
         }],

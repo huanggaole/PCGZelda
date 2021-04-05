@@ -1,5 +1,6 @@
 export default class BulletFactory{
     static mainsp:Laya.Sprite;
+    static bulletlist = [];
     constructor(battlesprite:Laya.Sprite){
         BulletFactory.mainsp = battlesprite;
     }
@@ -47,6 +48,14 @@ export default class BulletFactory{
             bs = bl.addComponent(BulletScript);    
         }
         bs = new BulletScript();
-        console.log(bl);
+        BulletFactory.bulletlist.push(bl);
+    }
+
+    static clearBullet(){
+        for(let i = 0; i < BulletFactory.bulletlist.length; i++){
+            Laya.Pool.recover('BulletType',BulletFactory.bulletlist[i]);
+            this.mainsp.removeChild(BulletFactory.bulletlist[i]);
+        }
+        BulletFactory.bulletlist = [];
     }
 }

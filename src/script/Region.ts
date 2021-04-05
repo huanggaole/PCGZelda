@@ -1,4 +1,4 @@
-import Node from "./Node"
+import Node, { NodeType } from "./Node"
 import BattleMaps from "../map/BattleMaps";
 export enum Direction{
     None,

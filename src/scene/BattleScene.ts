@@ -6,15 +6,18 @@ import Region, { RegionType } from "../script/Region";
 import BattleMaps from "../map/BattleMaps";
 import { NodeType } from "../script/Node";
 import EnemyFactory from "../map/EnemyFactory";
+import BulletFactory from "../map/BulletFactory";
 export default class BattleScene extends Laya.Scene{
     static regionmap:Region[][];
     static Lv;
 
     controller:GameControl;
     player:Laya.FontClip;
+    princess:Laya.FontClip;
     map_button:Laya.Button;
 
     static player;
+    static princess;
     static battleimagedeal:BattleImage[];
     static battleindex = 0;
     battlesprite1:Laya.Sprite;
@@ -42,8 +45,14 @@ export default class BattleScene extends Laya.Scene{
         for(let j = 0; j < regionmap.length; j++){
             for(let i = 0; i < regionmap[0].length; i++){
                 if(regionmap[j][i] && regionmap[j][i].node.type == NodeType.e){
+                    regionmap[j][i].tileArray[2][4] = 0;
+                    regionmap[j][i].tileArray[2][5] = 0;
                     BattleScene.tmpMapX = i;
                     BattleScene.tmpMapY = j;
+                }
+                if(regionmap[j][i] && (regionmap[j][i].node.type == NodeType.b || regionmap[j][i].node.type == NodeType.g)){
+                    regionmap[j][i].tileArray[2][4] = 0;
+                    regionmap[j][i].tileArray[2][5] = 0;
                 }
             }
         }
@@ -72,6 +81,7 @@ export default class BattleScene extends Laya.Scene{
         playercontroller.HP = 12;
 
         BattleScene.player = this.player;
+        BattleScene.princess = this.princess;
 
         BattleScene.MapImage = new SmallMapImage(BattleScene.regionmap);
         BattleScene.MapImage.visible = false;
@@ -99,6 +109,7 @@ export default class BattleScene extends Laya.Scene{
         let preindex = BattleScene.battleindex;
         let nowindex = BattleScene.battleindex = 1 - BattleScene.battleindex;
         EnemyFactory.clearEnemey();
+        BulletFactory.clearBullet();
         BattleScene.battleimagedeal[preindex].clearTiles(); 
         BattleScene.battleimagedeal[preindex].mainsp.removeChild(BattleScene.player);
         // BattleScene.battleimagedeal[preindex].mainsp.visible = false;
@@ -111,5 +122,10 @@ export default class BattleScene extends Laya.Scene{
         console.log(BattleScene.player);
         BattleScene.battleimagedeal[nowindex].mainsp.addChild(BattleScene.player);
         BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true; 
+
+        if(tmpregion.node.type == NodeType.g){
+            this.princess.visible = true;
+            Laya.timer.once(500,this,()=>{alert("恭喜你！成功救出了公主！点击确定重新开始游戏。");location.reload();})
+        }
     }
 }

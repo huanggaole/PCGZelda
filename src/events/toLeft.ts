@@ -7,7 +7,9 @@ export default class toLeft extends Laya.Script{
     onTriggerEnter(other){
         console.log("conce",this.conce);        
         if(other.owner.getComponent(Player) && this.conce){
-            if(toLeft.keyindex == -1){
+            if(toLeft.keyindex == -2){
+                alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
+            }else if(toLeft.keyindex == -1){
                 BattleScene.tmpMapX -= 1;
                 BattleScene.switchMap(880,0);
                 this.conce = false;   
