@@ -4,7 +4,7 @@ import BattleScene from "../scene/BattleScene"
 import BulletFactory from "../map/BulletFactory";
 import { BeanArrow } from "../bullet/BeanArrow";
 import { PlayerArrow } from "../bullet/PlayerArrow";
-export default class GrassEnemy2 extends Character{
+export default class SnowEnemy2 extends Character{
     static BattlePoint = 3;
     static skinname = "Enemy/4.png";
     AItick = 0;

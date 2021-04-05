@@ -294,10 +294,40 @@
 
     class BattleMaps {
     }
+    BattleMaps.bm0 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
     BattleMaps.bm1 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
         [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
+    BattleMaps.bm2 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
+    BattleMaps.bm3 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
+    BattleMaps.bm4 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ];
+    BattleMaps.bm5 = [[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     ];
 
@@ -325,7 +355,26 @@
             this.leftConnect = false;
             this.rightConnect = false;
             this.regiontype = RegionType.Undefined;
-            let targetMap = BattleMaps.bm1;
+            let rndIndex = Math.floor(Math.random() * 6);
+            let targetMap;
+            if (rndIndex == 0) {
+                targetMap = BattleMaps.bm0;
+            }
+            else if (rndIndex == 1) {
+                targetMap = BattleMaps.bm1;
+            }
+            else if (rndIndex == 2) {
+                targetMap = BattleMaps.bm2;
+            }
+            else if (rndIndex == 3) {
+                targetMap = BattleMaps.bm3;
+            }
+            else if (rndIndex == 4) {
+                targetMap = BattleMaps.bm4;
+            }
+            else if (rndIndex == 5) {
+                targetMap = BattleMaps.bm5;
+            }
             this.tileArray = [];
             for (let j = 0; j < targetMap.length; j++) {
                 let tmprow = [];
@@ -1312,7 +1361,7 @@
         }
         addExp() {
             super.addExp();
-            Player.exp += 2;
+            Player.exp += 5;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
         }
         doShoot() {
