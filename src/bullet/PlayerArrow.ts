@@ -24,7 +24,7 @@ export class PlayerArrow extends Laya.Script{
                 let character = (other.owner as Laya.Node).getComponent(Character);
                 if(character && !character.invincibleStatus){
                     character.hurtFrame = 20;
-                    character.HP -= this.damage;
+                    character.HP -= (this.damage + Player.attackdamage);
                 }
                 let owner = this.owner as Laya.Image;
                 this.removeOwner(owner);

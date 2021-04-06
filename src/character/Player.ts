@@ -14,6 +14,8 @@ export default class Player extends Character{
     attackPre = 2;
     attackAft = 5;
 
+    static attackdamage = 0;
+
     onUpdate(){
         if(this.HP <= 0 && this.hurtFrame == 0){
             this.HP = 12;

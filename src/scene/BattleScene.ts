@@ -1,5 +1,7 @@
 import { GameControl } from "./GameControl";
 import SmallMapImage from "../graphic/SmallMapImage";
+import SkillLearningImage from "../graphic/SkillLearningImage";
+
 import Player from "../character/Player";
 import BattleImage from "../map/BattleImage";
 import Region, { RegionType } from "../script/Region";
@@ -10,11 +12,13 @@ import BulletFactory from "../map/BulletFactory";
 export default class BattleScene extends Laya.Scene{
     static regionmap:Region[][];
     static Lv;
+    static lvup_button:Laya.Button;
 
     controller:GameControl;
     player:Laya.FontClip;
     princess:Laya.FontClip;
     map_button:Laya.Button;
+    lvup:Laya.Button;
 
     static player;
     static princess;
@@ -38,6 +42,7 @@ export default class BattleScene extends Laya.Scene{
     static tmpMapY = 0;
 
     static MapImage:SmallMapImage;
+    static SkillImage:SkillLearningImage;
 
     constructor(regionmap:Region[][]){
         super();
@@ -82,13 +87,19 @@ export default class BattleScene extends Laya.Scene{
 
         BattleScene.player = this.player;
         BattleScene.princess = this.princess;
+        BattleScene.lvup_button = this.lvup;
 
         BattleScene.MapImage = new SmallMapImage(BattleScene.regionmap);
+        BattleScene.SkillImage = new SkillLearningImage(this.player.getComponent(Player));
         BattleScene.MapImage.visible = false;
+        BattleScene.SkillImage.visible = false;
         this.addChild(BattleScene.MapImage);
+        
+
         BattleScene.MapImage.centerX = 0;
         BattleScene.MapImage.centerY = 0;
         this.map_button.on(Laya.Event.CLICK, BattleScene, ()=>{BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);BattleScene.MapImage.visible = !BattleScene.MapImage.visible;console.log("map");});
+        this.lvup.on(Laya.Event.CLICK, BattleScene, ()=>{BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible;});
 
         this.controller = new GameControl(playercontroller);
         BattleScene.hearts = [];
@@ -98,7 +109,9 @@ export default class BattleScene extends Laya.Scene{
         BattleScene.hearts.push(this.heart4);
         BattleScene.hearts.push(this.heart5);
         BattleScene.hearts.push(this.heart6);
-        this.addChild(this.controller);       
+        this.addChild(this.controller);
+        this.addChild(BattleScene.SkillImage);
+
     }
 
     static switchMap(delx:number, dely:number){

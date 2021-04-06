@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":111,
+    "selecteID":115,
     "searchKey":"Scene",
     "props":{"width":960,"sceneColor":"#000000","height":640},
     "nodeParent":-1,
-    "maxID":115,
+    "maxID":116,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -846,6 +846,20 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":111,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Button",
+            "searchKey":"Button,lvup",
+            "props":{"y":25,"x":785,"visible":false,"var":"lvup","stateNum":"1","skin":"comp/LvUp.png","scaleY":3,"scaleX":3},
+            "nodeParent":2,
+            "label":"lvup",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":115,
             "child":[
                 ]
         }],

@@ -41,9 +41,9 @@ export default class SnowEnemy2 extends Character{
     }
 
     addExp(){
-        super.addExp();
         Player.exp += 0;
         BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+        super.addExp();
     }
 
     doShoot(){

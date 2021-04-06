@@ -2,6 +2,7 @@ import BattleScene from "../scene/BattleScene";
 import BulletFactory from "../map/BulletFactory";
 import EnemyFactory from "../map/EnemyFactory";
 import Player from "./Player";
+import SkillLearningImage from "../graphic/SkillLearningImage";
 
 export enum CharacterAction{
     None,
@@ -118,9 +119,15 @@ export default class Character extends Laya.Script{
         }
     }
     addExp(){
-        console.log("AddExp");
+        if(Player.exp >= Player.maxExp){
+            SkillLearningImage.initBtns();
+            BattleScene.lvup_button.visible = true;
+        }
     }
     onUpdate(){
+        if(this.HP < 0){
+            this.HP = 0;
+        }
         if(this.HP <= 0 && this.hurtFrame == 0){
             this.addExp();
             (this.owner as Laya.FontClip).x = -100;

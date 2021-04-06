@@ -984,9 +984,15 @@
             }
         }
         addExp() {
-            console.log("AddExp");
+            if (Player.exp >= Player.maxExp) {
+                SkillLearningImage.initBtns();
+                BattleScene.lvup_button.visible = true;
+            }
         }
         onUpdate() {
+            if (this.HP < 0) {
+                this.HP = 0;
+            }
             if (this.HP <= 0 && this.hurtFrame == 0) {
                 this.addExp();
                 this.owner.x = -100;
@@ -1071,9 +1077,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 2;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         AI() {
             this.AItick++;
@@ -1132,9 +1138,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 2;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         AI() {
             this.AItick++;
@@ -1193,9 +1199,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 2;
             BattleScene.Lv.text = "lv. " + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         AI() {
             this.AItick++;
@@ -1254,9 +1260,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 2;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         AI() {
             this.AItick++;
@@ -1374,9 +1380,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 5;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         doShoot() {
             let owner = this.owner;
@@ -1511,9 +1517,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 5;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         doShoot() {
             let owner = this.owner;
@@ -1669,9 +1675,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 5;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         doShoot() {
             let owner = this.owner;
@@ -1850,9 +1856,9 @@
             this.AI();
         }
         addExp() {
-            super.addExp();
             Player.exp += 0;
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            super.addExp();
         }
         doShoot() {
             let owner = this.owner;
@@ -2082,7 +2088,7 @@
                     let character = other.owner.getComponent(Character);
                     if (character && !character.invincibleStatus) {
                         character.hurtFrame = 20;
-                        character.HP -= this.damage;
+                        character.HP -= (this.damage + Player.attackdamage);
                     }
                     let owner = this.owner;
                     this.removeOwner(owner);
@@ -2239,6 +2245,148 @@
     Player.Level = 1;
     Player.exp = 0;
     Player.maxExp = 10;
+    Player.attackdamage = 0;
+
+    class SkillLearningImage extends Laya.Image {
+        constructor(player) {
+            super();
+            SkillLearningImage.player = player;
+            this.skin = ("comp/dialogue-bubble.png");
+            this.width = 400;
+            this.height = 200;
+            this.sizeGrid = "20,20,20,20";
+            this.centerX = 0;
+            this.centerY = 0;
+            this.zOrder = 1003;
+            SkillLearningImage.curebtn = new Laya.Button("comp/cure.png", "回复所有体力");
+            SkillLearningImage.speedbtn = new Laya.Button("comp/cure.png", "强化速度\vLv." + (SkillLearningImage.speedlvl + 1));
+            SkillLearningImage.weaponbtn = new Laya.Button("comp/cure.png", "强化武器\vLv." + (SkillLearningImage.weaponlvl + 1));
+            SkillLearningImage.lifebtn = new Laya.Button("comp/cure.png", "强化生命容量\vLv." + (SkillLearningImage.lifelvl + 1));
+            SkillLearningImage.weaponspeedbtn = new Laya.Button("comp/cure.png", "强化攻击频率\vLv." + (SkillLearningImage.weaponspeed + 1));
+            SkillLearningImage.damagebtn = new Laya.Button("comp/cure.png", "强化伤害\vLv." + (SkillLearningImage.damagelvl + 1));
+            SkillLearningImage.curebtn.stateNum = 1;
+            SkillLearningImage.speedbtn.stateNum = 1;
+            SkillLearningImage.weaponbtn.stateNum = 1;
+            SkillLearningImage.lifebtn.stateNum = 1;
+            SkillLearningImage.weaponspeedbtn.stateNum = 1;
+            SkillLearningImage.damagebtn.stateNum = 1;
+            SkillLearningImage.curebtn.y = 40;
+            SkillLearningImage.speedbtn.y = 40;
+            SkillLearningImage.weaponbtn.y = 40;
+            SkillLearningImage.lifebtn.y = 40;
+            SkillLearningImage.weaponspeedbtn.y = 40;
+            SkillLearningImage.damagebtn.y = 40;
+            this.addChild(SkillLearningImage.curebtn);
+            this.addChild(SkillLearningImage.speedbtn);
+            this.addChild(SkillLearningImage.weaponbtn);
+            this.addChild(SkillLearningImage.lifebtn);
+            this.addChild(SkillLearningImage.weaponspeedbtn);
+            this.addChild(SkillLearningImage.damagebtn);
+        }
+        static initBtns() {
+            let ups = [];
+            while (ups.length < 3) {
+                let rnd = Math.floor(Math.random() * 6);
+                if (ups.includes(rnd)) {
+                    continue;
+                }
+                if (rnd == 2 && this.weaponlvl >= 3) {
+                    continue;
+                }
+                if (rnd == 3 && this.lifelvl >= 3) {
+                    continue;
+                }
+                ups.push(rnd);
+            }
+            SkillLearningImage.curebtn.visible = false;
+            SkillLearningImage.speedbtn.visible = false;
+            SkillLearningImage.weaponbtn.visible = false;
+            SkillLearningImage.lifebtn.visible = false;
+            SkillLearningImage.weaponspeedbtn.visible = false;
+            SkillLearningImage.damagebtn.visible = false;
+            SkillLearningImage.curebtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onCure);
+            SkillLearningImage.speedbtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onSpeed);
+            SkillLearningImage.weaponbtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onWeapon);
+            SkillLearningImage.lifebtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onLife);
+            SkillLearningImage.weaponspeedbtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onWeaponspeed);
+            SkillLearningImage.damagebtn.on(Laya.Event.CLICK, SkillLearningImage, SkillLearningImage.onDamage);
+            for (let i = 0; i < 3; i++) {
+                let index = ups[i];
+                if (index == 0) {
+                    SkillLearningImage.curebtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.curebtn.visible = true;
+                    SkillLearningImage.curebtn.label = "回复所有体力";
+                }
+                else if (index == 1) {
+                    SkillLearningImage.speedbtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.speedbtn.visible = true;
+                    SkillLearningImage.speedbtn.label = "强化速度\vLv." + (SkillLearningImage.speedlvl + 1);
+                }
+                else if (index == 2) {
+                    SkillLearningImage.weaponbtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.weaponbtn.visible = true;
+                    SkillLearningImage.weaponbtn.label = "强化武器\vLv." + (SkillLearningImage.weaponlvl + 1);
+                }
+                else if (index == 3) {
+                    SkillLearningImage.lifebtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.lifebtn.visible = true;
+                    SkillLearningImage.lifebtn.label = "强化生命容量\vLv." + (SkillLearningImage.lifelvl + 1);
+                }
+                else if (index == 4) {
+                    SkillLearningImage.weaponspeedbtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.weaponspeedbtn.visible = true;
+                    SkillLearningImage.weaponspeedbtn.label = "强化攻击频率\vLv." + (SkillLearningImage.weaponspeed + 1);
+                }
+                else if (index == 5) {
+                    SkillLearningImage.damagebtn.x = 120 * i + 10 * (i + 1);
+                    SkillLearningImage.damagebtn.visible = true;
+                    SkillLearningImage.damagebtn.label = "强化伤害\vLv." + (SkillLearningImage.damagelvl + 1);
+                }
+            }
+        }
+        static onCure() {
+            this.player.hp = this.player.maxHP;
+            this.curetime++;
+            this.onButton();
+        }
+        static onSpeed() {
+            this.player.speed++;
+            this.speedlvl++;
+            this.onButton();
+        }
+        static onWeapon() {
+            this.onButton();
+        }
+        static onLife() {
+            this.player.maxHP++;
+            this.lifelvl++;
+            this.onButton();
+        }
+        static onWeaponspeed() {
+            this.player.attackInterval = Math.floor(this.player.attackInterval * 0.8);
+            this.weaponlvl++;
+            this.onButton();
+        }
+        static onDamage() {
+            Player.attackdamage += 0.5;
+            this.damagelvl++;
+            this.onButton();
+        }
+        static onButton() {
+            Player.Level++;
+            Player.exp -= Player.maxExp;
+            Player.maxExp = Math.floor(Player.maxExp * 1.3);
+            BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
+            BattleScene.lvup_button.visible = false;
+            BattleScene.SkillImage.visible = false;
+        }
+    }
+    SkillLearningImage.curetime = 0;
+    SkillLearningImage.speedlvl = 0;
+    SkillLearningImage.weaponlvl = 0;
+    SkillLearningImage.lifelvl = 0;
+    SkillLearningImage.weaponspeed = 0;
+    SkillLearningImage.damagelvl = 0;
 
     class BattleImage {
         constructor(battlesprite) {
@@ -2443,12 +2591,16 @@
             playercontroller.HP = 12;
             BattleScene.player = this.player;
             BattleScene.princess = this.princess;
+            BattleScene.lvup_button = this.lvup;
             BattleScene.MapImage = new Smallthis(BattleScene.regionmap);
+            BattleScene.SkillImage = new SkillLearningImage(this.player.getComponent(Player));
             BattleScene.MapImage.visible = false;
+            BattleScene.SkillImage.visible = false;
             this.addChild(BattleScene.MapImage);
             BattleScene.MapImage.centerX = 0;
             BattleScene.MapImage.centerY = 0;
             this.map_button.on(Laya.Event.CLICK, BattleScene, () => { BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY); BattleScene.MapImage.visible = !BattleScene.MapImage.visible; console.log("map"); });
+            this.lvup.on(Laya.Event.CLICK, BattleScene, () => { BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible; });
             this.controller = new GameControl(playercontroller);
             BattleScene.hearts = [];
             BattleScene.hearts.push(this.heart1);
@@ -2458,6 +2610,7 @@
             BattleScene.hearts.push(this.heart5);
             BattleScene.hearts.push(this.heart6);
             this.addChild(this.controller);
+            this.addChild(BattleScene.SkillImage);
         }
         static switchMap(delx, dely) {
             BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY);
