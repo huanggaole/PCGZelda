@@ -1,0 +1,7 @@
+{
+  "code": "import BattleScene from \"../scene/BattleScene\";\r\nimport Player from \"../character/Player\";\r\nexport default class toDown extends Laya.Script {\r\n    constructor() {\r\n        super(...arguments);\r\n        this.conce = true;\r\n    }\r\n    onTriggerEnter(other) {\r\n        console.log(\"conce\", this.conce);\r\n        if (other.owner.getComponent(Player) && this.conce) {\r\n            if (toDown.keyindex == -2) {\r\n                Laya.SoundManager.playSound(\"sound/magic-1.ogg\");\r\n                alert(\"囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！\");\r\n            }\r\n            else if (toDown.keyindex == -1) {\r\n                BattleScene.tmpMapY += 1;\r\n                BattleScene.switchMap(0, -400);\r\n                this.conce = false;\r\n                Laya.timer.once(500, this, () => { this.conce = true; });\r\n            }\r\n            else {\r\n                Laya.SoundManager.playSound(\"sound/magic-1.ogg\");\r\n                alert(\"想要通过这里继续前进，你必须想首先办法获得\" + toDown.keyindex + \"号钥匙证明自己的实力！\");\r\n            }\r\n        }\r\n    }\r\n}\r\ntoDown.keyindex = -1;\r\n",
+  "references": [
+    "/Users/huanggaole/PCGZelda/src/scene/BattleScene.ts",
+    "/Users/huanggaole/PCGZelda/src/character/Player.ts"
+  ]
+}

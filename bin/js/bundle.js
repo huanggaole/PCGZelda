@@ -985,6 +985,7 @@
         }
         addExp() {
             if (Player.exp >= Player.maxExp) {
+                Laya.SoundManager.playSound("sound/power-up.ogg");
                 SkillLearningImage.initBtns();
                 BattleScene.lvup_button.visible = true;
             }
@@ -1108,6 +1109,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1169,6 +1171,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1230,6 +1233,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1291,6 +1295,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1316,6 +1321,7 @@
                     if (player && !player.invincibleStatus) {
                         player.hurtFrame = 20;
                         player.HP -= this.damage;
+                        Laya.SoundManager.playSound("sound/12.ogg");
                     }
                     let owner = this.owner;
                     this.removeOwner(owner);
@@ -1424,6 +1430,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1453,6 +1460,7 @@
                     if (player && !player.invincibleStatus) {
                         player.hurtFrame = 20;
                         player.HP -= this.damage;
+                        Laya.SoundManager.playSound("sound/12.ogg");
                     }
                     let owner = this.owner;
                     this.removeOwner(owner);
@@ -1577,6 +1585,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1607,6 +1616,7 @@
                     if (player && !player.invincibleStatus) {
                         player.hurtFrame = 20;
                         player.HP -= this.damage;
+                        Laya.SoundManager.playSound("sound/12.ogg");
                     }
                     this.removeOwner(owner);
                 }
@@ -1719,6 +1729,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -1735,6 +1746,7 @@
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
                 if (toUp.keyindex == -2) {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
                 }
                 else if (toUp.keyindex == -1) {
@@ -1744,6 +1756,7 @@
                     Laya.timer.once(500, this, () => { this.conce = true; });
                 }
                 else {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("想要通过这里继续前进，你必须想首先办法获得" + toUp.keyindex + "号钥匙证明自己的实力！");
                 }
             }
@@ -1760,6 +1773,7 @@
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
                 if (toDown.keyindex == -2) {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
                 }
                 else if (toDown.keyindex == -1) {
@@ -1769,6 +1783,7 @@
                     Laya.timer.once(500, this, () => { this.conce = true; });
                 }
                 else {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("想要通过这里继续前进，你必须想首先办法获得" + toDown.keyindex + "号钥匙证明自己的实力！");
                 }
             }
@@ -1785,6 +1800,7 @@
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
                 if (toLeft.keyindex == -2) {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
                 }
                 else if (toLeft.keyindex == -1) {
@@ -1794,6 +1810,7 @@
                     Laya.timer.once(500, this, () => { this.conce = true; });
                 }
                 else {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("想要通过这里继续前进，你必须想首先办法获得" + toLeft.keyindex + "号钥匙证明自己的实力！");
                 }
             }
@@ -1810,6 +1827,7 @@
             console.log("conce", this.conce);
             if (other.owner.getComponent(Player) && this.conce) {
                 if (toRight.keyindex == -2) {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("囚禁公主的房间锁上了，必须打败魔王才能拿到钥匙！");
                 }
                 else if (toRight.keyindex == -1) {
@@ -1819,6 +1837,7 @@
                     Laya.timer.once(500, this, () => { this.conce = true; });
                 }
                 else {
+                    Laya.SoundManager.playSound("sound/magic-1.ogg");
                     alert("想要通过这里继续前进，你必须想首先办法获得" + toRight.keyindex + "号钥匙证明自己的实力！");
                 }
             }
@@ -1933,6 +1952,7 @@
                 if (character && !character.invincibleStatus) {
                     character.hurtFrame = 20;
                     character.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
             }
         }
@@ -2089,6 +2109,7 @@
                     if (character && !character.invincibleStatus) {
                         character.hurtFrame = 20;
                         character.HP -= (this.damage + Player.attackdamage);
+                        Laya.SoundManager.playSound("sound/kill.ogg");
                     }
                     let owner = this.owner;
                     this.removeOwner(owner);
@@ -2121,6 +2142,128 @@
     PlayerArrow.height = 5;
     PlayerArrow.speed = 5;
 
+    class PlayerArrow2 extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
+        onTriggerEnter(other) {
+            if (this.owner && other.owner) {
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                }
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character && !character.invincibleStatus) {
+                        character.hurtFrame = 20;
+                        character.HP -= (this.damage + Player.attackdamage);
+                        Laya.SoundManager.playSound("sound/kill.ogg");
+                    }
+                    let owner = this.owner;
+                    this.removeOwner(owner);
+                }
+            }
+        }
+        removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
+            owner._destroyAllComponent();
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
+        }
+    }
+    PlayerArrow2.skin = "Bullet/arrow2.png";
+    PlayerArrow2.scale = 2;
+    PlayerArrow2.width = 8;
+    PlayerArrow2.height = 10;
+    PlayerArrow2.speed = 5;
+
+    class PlayerArrow3 extends Laya.Script {
+        constructor() {
+            super(...arguments);
+            this.damage = 1;
+        }
+        onUpdate() {
+            let owner = this.owner;
+            if (owner.x < 0 || owner.y < 0 || owner.x > 960 || owner.y > 480) {
+                this.removeOwner(owner);
+            }
+        }
+        onTriggerEnter(other) {
+            let owner = this.owner;
+            if (this.owner && other.owner) {
+                let player = other.owner.getComponent(Player);
+                if (player) {
+                }
+                else {
+                    let character = other.owner.getComponent(Character);
+                    if (character && !character.invincibleStatus) {
+                        character.hurtFrame = 20;
+                        character.HP -= (this.damage + Player.attackdamage);
+                        Laya.SoundManager.playSound("sound/kill.ogg");
+                        this.removeOwner(owner);
+                    }
+                    else {
+                        if (Player.weapontype == 3) {
+                            let rb = owner.getComponent(Laya.RigidBody);
+                            if (owner.y < other.owner.y || owner.y > other.owner.y + other.owner.height - 5) {
+                                rb.setVelocity({ x: -rb.linearVelocity.x, y: rb.linearVelocity.y });
+                            }
+                            else {
+                                rb.setVelocity({ x: rb.linearVelocity.x, y: -rb.linearVelocity.y });
+                            }
+                        }
+                        else {
+                            this.removeOwner(owner);
+                        }
+                    }
+                }
+            }
+        }
+        removeOwner(owner) {
+            let rg = owner.getComponent(Laya.RigidBody);
+            let bc = owner.getComponent(Laya.BoxCollider);
+            if (rg) {
+                rg.enabled = false;
+            }
+            if (bc) {
+                bc.enabled = false;
+            }
+            if (bc) {
+                owner._destroyComponent(bc);
+            }
+            if (rg) {
+                owner._destroyComponent(rg);
+            }
+            owner._destroyAllComponent();
+            BulletFactory.mainsp.removeChild(owner);
+            Laya.Pool.recover('BulletType', owner);
+        }
+    }
+    PlayerArrow3.skin = "Bullet/arrow3.png";
+    PlayerArrow3.scale = 2;
+    PlayerArrow3.width = 16;
+    PlayerArrow3.height = 16;
+    PlayerArrow3.speed = 5;
+
     class Player extends Character {
         constructor() {
             super(...arguments);
@@ -2152,6 +2295,7 @@
                 }
             }
             if (this.HP <= 0 && this.hurtFrame == 0) {
+                Laya.SoundManager.playSound("game-over-2.ogg");
                 alert("你失败了！要看广告后复活吗？");
             }
             if (this.x == 0 && this.y == 0) {
@@ -2166,6 +2310,7 @@
                         let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
                         if (tmpregion.node.type == NodeType.k) {
                             Laya.timer.once(500, this, () => {
+                                Laya.SoundManager.playSound("sound/alert.ogg");
                                 alert("你获得了" + tmpregion.node.keyTo[0] + "号钥匙，" + tmpregion.node.keyTo[0] + "号关卡的守卫已经离开了！");
                             });
                             tmpregion.node.type = NodeType.t;
@@ -2239,13 +2384,23 @@
         }
         doShoot() {
             let owner = this.owner;
-            BulletFactory.initBullet(PlayerArrow, owner.x, owner.y, this.dirx, this.diry);
+            Laya.SoundManager.playSound("sound/13.ogg");
+            if (Player.weapontype == 0) {
+                BulletFactory.initBullet(PlayerArrow, owner.x, owner.y, this.dirx, this.diry);
+            }
+            else if (Player.weapontype == 1) {
+                BulletFactory.initBullet(PlayerArrow2, owner.x, owner.y, this.dirx, this.diry);
+            }
+            else {
+                BulletFactory.initBullet(PlayerArrow3, owner.x, owner.y, this.dirx, this.diry);
+            }
         }
     }
     Player.Level = 1;
     Player.exp = 0;
     Player.maxExp = 10;
     Player.attackdamage = 0;
+    Player.weapontype = 0;
 
     class SkillLearningImage extends Laya.Image {
         constructor(player) {
@@ -2345,7 +2500,7 @@
             }
         }
         static onCure() {
-            this.player.hp = this.player.maxHP;
+            this.player.HP = this.player.maxHP;
             this.curetime++;
             this.onButton();
         }
@@ -2355,6 +2510,8 @@
             this.onButton();
         }
         static onWeapon() {
+            Player.weapontype++;
+            this.weaponlvl++;
             this.onButton();
         }
         static onLife() {
@@ -2364,7 +2521,7 @@
         }
         static onWeaponspeed() {
             this.player.attackInterval = Math.floor(this.player.attackInterval * 0.8);
-            this.weaponlvl++;
+            this.weaponspeed++;
             this.onButton();
         }
         static onDamage() {
@@ -2373,11 +2530,17 @@
             this.onButton();
         }
         static onButton() {
+            Laya.SoundManager.playSound("sound/succes.ogg");
             Player.Level++;
             Player.exp -= Player.maxExp;
             Player.maxExp = Math.floor(Player.maxExp * 1.3);
             BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
-            BattleScene.lvup_button.visible = false;
+            if (Player.maxExp > Player.exp) {
+                BattleScene.lvup_button.visible = false;
+            }
+            else {
+                this.initBtns();
+            }
             BattleScene.SkillImage.visible = false;
         }
     }
@@ -2583,6 +2746,7 @@
             BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite1));
             BattleScene.battleimagedeal.push(new BattleImage(this.battlesprite2));
             let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+            BattleScene.lastRegionType = tmpregion.regiontype;
             BattleScene.battleimagedeal[BattleScene.battleindex].initMap(tmpregion.regiontype, tmpregion.tileArray, tmpregion.enmeyForce);
             BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
             BattleScene.battleimagedeal[1 - BattleScene.battleindex].mainsp.visible = false;
@@ -2599,8 +2763,8 @@
             this.addChild(BattleScene.MapImage);
             BattleScene.MapImage.centerX = 0;
             BattleScene.MapImage.centerY = 0;
-            this.map_button.on(Laya.Event.CLICK, BattleScene, () => { BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY); BattleScene.MapImage.visible = !BattleScene.MapImage.visible; console.log("map"); });
-            this.lvup.on(Laya.Event.CLICK, BattleScene, () => { BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible; });
+            this.map_button.on(Laya.Event.CLICK, BattleScene, () => { Laya.SoundManager.playSound("sound/menu-2.ogg"); BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY); BattleScene.MapImage.visible = !BattleScene.MapImage.visible; console.log("map"); });
+            this.lvup.on(Laya.Event.CLICK, BattleScene, () => { Laya.SoundManager.playSound("sound/menu-1.ogg"); BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible; });
             this.controller = new GameControl(playercontroller);
             BattleScene.hearts = [];
             BattleScene.hearts.push(this.heart1);
@@ -2611,11 +2775,27 @@
             BattleScene.hearts.push(this.heart6);
             this.addChild(this.controller);
             this.addChild(BattleScene.SkillImage);
+            Laya.SoundManager.playMusic("music/theme-5.ogg", 0);
         }
         static switchMap(delx, dely) {
             BattleScene.MapImage.redraw(BattleScene.tmpMapX, BattleScene.tmpMapY);
             console.log(BattleScene.regionmap);
             let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+            if (this.lastRegionType != tmpregion.regiontype) {
+                if (tmpregion.regiontype == RegionType.Grass) {
+                    Laya.SoundManager.playMusic("music/theme-5.ogg", 0);
+                }
+                else if (tmpregion.regiontype == RegionType.Desert) {
+                    Laya.SoundManager.playMusic("music/theme-6.ogg", 0);
+                }
+                else if (tmpregion.regiontype == RegionType.Snow) {
+                    Laya.SoundManager.playMusic("music/theme-7.ogg", 0);
+                }
+                else {
+                    Laya.SoundManager.playMusic("music/theme-2.ogg", 0);
+                }
+            }
+            this.lastRegionType = tmpregion.regiontype;
             let preindex = BattleScene.battleindex;
             let nowindex = BattleScene.battleindex = 1 - BattleScene.battleindex;
             EnemyFactory.clearEnemey();
@@ -2632,7 +2812,16 @@
             BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
             if (tmpregion.node.type == NodeType.g) {
                 this.princess.visible = true;
-                Laya.timer.once(500, this, () => { alert("恭喜你！成功救出了公主！点击确定重新开始游戏。"); location.reload(); });
+                Laya.SoundManager.playMusic("music/theme-18.ogg", 0);
+                Laya.timer.once(500, this, () => {
+                    Laya.SoundManager.playSound("sound/succes-3.ogg");
+                    alert("恭喜你！成功救出了公主！");
+                    alert("本游戏为字节跳动第二届EMagic Jam作品");
+                    alert("作者：黄高乐 huanggaole@bytedance.com");
+                    alert("感谢您的试玩～");
+                    alert("点击确定重新开始游戏。");
+                    location.reload();
+                });
             }
         }
     }

@@ -120,6 +120,7 @@ export default class Character extends Laya.Script{
     }
     addExp(){
         if(Player.exp >= Player.maxExp){
+            Laya.SoundManager.playSound("sound/power-up.ogg");
             SkillLearningImage.initBtns();
             BattleScene.lvup_button.visible = true;
         }
@@ -129,6 +130,7 @@ export default class Character extends Laya.Script{
             this.HP = 0;
         }
         if(this.HP <= 0 && this.hurtFrame == 0){
+            
             this.addExp();
             (this.owner as Laya.FontClip).x = -100;
             (this.owner as Laya.FontClip).y = -100;

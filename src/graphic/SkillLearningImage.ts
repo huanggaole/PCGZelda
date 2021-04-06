@@ -133,6 +133,8 @@ export default class SkillLearningImage extends Laya.Image{
         this.onButton();
     }
     static onWeapon(){
+        Player.weapontype++;
+        this.weaponlvl++;
         this.onButton();
     }
     static onLife(){
@@ -142,7 +144,7 @@ export default class SkillLearningImage extends Laya.Image{
     }
     static onWeaponspeed(){
         this.player.attackInterval = Math.floor(this.player.attackInterval * 0.8);
-        this.weaponlvl++;
+        this.weaponspeed++;
         this.onButton();
     }
     static onDamage(){
@@ -152,11 +154,16 @@ export default class SkillLearningImage extends Laya.Image{
     }
 
     static onButton(){
+        Laya.SoundManager.playSound("sound/succes.ogg");
         Player.Level++;
         Player.exp -= Player.maxExp;
         Player.maxExp = Math.floor(Player.maxExp * 1.3);
         BattleScene.Lv.text = "lv." + Player.Level + " exp/next:" + Player.exp + "/" + Player.maxExp;
-        BattleScene.lvup_button.visible = false;
+        if(Player.maxExp > Player.exp){
+            BattleScene.lvup_button.visible = false;
+        }else{
+            this.initBtns();
+        }
         BattleScene.SkillImage.visible = false;
     }
 }

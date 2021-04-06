@@ -26,6 +26,7 @@ export class IceArrow extends Laya.Script{
                 if(player && !player.invincibleStatus){
                     player.hurtFrame = 20;
                     player.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
                 let owner = this.owner as Laya.Image;
                 this.removeOwner(owner);

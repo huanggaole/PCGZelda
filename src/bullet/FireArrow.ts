@@ -27,6 +27,7 @@ export class FireArrow extends Laya.Script{
                 if(player && !player.invincibleStatus){
                     player.hurtFrame = 20;
                     player.HP -= this.damage;
+                    Laya.SoundManager.playSound("sound/12.ogg");
                 }
                 this.removeOwner(owner);
             }else{

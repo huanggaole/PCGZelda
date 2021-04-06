@@ -4,6 +4,8 @@ import BulletFactory from "../map/BulletFactory";
 import { PlayerArrow } from "../bullet/PlayerArrow";
 import BattleScene from "../scene/BattleScene";
 import { NodeType } from "../script/Node";
+import { PlayerArrow2 } from "../bullet/PlayerArrow2";
+import { PlayerArrow3 } from "../bullet/PlayerArrow3";
 export default class Player extends Character{
     static Level = 1;
     static exp = 0;
@@ -15,6 +17,7 @@ export default class Player extends Character{
     attackAft = 5;
 
     static attackdamage = 0;
+    static weapontype = 0;
 
     onUpdate(){
         if(this.HP <= 0 && this.hurtFrame == 0){
@@ -37,6 +40,7 @@ export default class Player extends Character{
             }
         }
         if(this.HP <= 0 && this.hurtFrame == 0){
+            Laya.SoundManager.playSound("game-over-2.ogg");
             alert("你失败了！要看广告后复活吗？");
         }
         if(this.x == 0 && this.y == 0){
@@ -53,6 +57,7 @@ export default class Player extends Character{
                     let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
                     if(tmpregion.node.type == NodeType.k){
                         Laya.timer.once(500,this,()=>{
+                            Laya.SoundManager.playSound("sound/alert.ogg");
                             alert("你获得了"+tmpregion.node.keyTo[0]+"号钥匙，"+tmpregion.node.keyTo[0]+"号关卡的守卫已经离开了！");
                         })
                         tmpregion.node.type = NodeType.t;
@@ -127,6 +132,13 @@ export default class Player extends Character{
 
     doShoot(){
         let owner = this.owner as Laya.FontClip;
-        BulletFactory.initBullet(PlayerArrow,owner.x, owner.y, this.dirx,this.diry);
+        Laya.SoundManager.playSound("sound/13.ogg");
+        if(Player.weapontype == 0){
+            BulletFactory.initBullet(PlayerArrow,owner.x, owner.y, this.dirx,this.diry);
+        }else if(Player.weapontype == 1){
+            BulletFactory.initBullet(PlayerArrow2,owner.x, owner.y, this.dirx,this.diry);
+        }else{
+            BulletFactory.initBullet(PlayerArrow3,owner.x, owner.y, this.dirx,this.diry);
+        }
     }
 }

@@ -44,6 +44,8 @@ export default class BattleScene extends Laya.Scene{
     static MapImage:SmallMapImage;
     static SkillImage:SkillLearningImage;
 
+    static lastRegionType;
+
     constructor(regionmap:Region[][]){
         super();
         BattleScene.regionmap = regionmap;
@@ -76,6 +78,8 @@ export default class BattleScene extends Laya.Scene{
         
         // 加载地图
         let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+        BattleScene.lastRegionType = tmpregion.regiontype;
+        
         BattleScene.battleimagedeal[BattleScene.battleindex].initMap(tmpregion.regiontype,tmpregion.tileArray, tmpregion.enmeyForce);
         BattleScene.battleimagedeal[BattleScene.battleindex].mainsp.visible = true;
         BattleScene.battleimagedeal[1 - BattleScene.battleindex].mainsp.visible = false;
@@ -98,8 +102,8 @@ export default class BattleScene extends Laya.Scene{
 
         BattleScene.MapImage.centerX = 0;
         BattleScene.MapImage.centerY = 0;
-        this.map_button.on(Laya.Event.CLICK, BattleScene, ()=>{BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);BattleScene.MapImage.visible = !BattleScene.MapImage.visible;console.log("map");});
-        this.lvup.on(Laya.Event.CLICK, BattleScene, ()=>{BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible;});
+        this.map_button.on(Laya.Event.CLICK, BattleScene, ()=>{Laya.SoundManager.playSound("sound/menu-2.ogg");BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);BattleScene.MapImage.visible = !BattleScene.MapImage.visible;console.log("map");});
+        this.lvup.on(Laya.Event.CLICK, BattleScene, ()=>{Laya.SoundManager.playSound("sound/menu-1.ogg");BattleScene.SkillImage.visible = !BattleScene.SkillImage.visible;});
 
         this.controller = new GameControl(playercontroller);
         BattleScene.hearts = [];
@@ -111,14 +115,29 @@ export default class BattleScene extends Laya.Scene{
         BattleScene.hearts.push(this.heart6);
         this.addChild(this.controller);
         this.addChild(BattleScene.SkillImage);
-
+        Laya.SoundManager.playMusic("music/theme-5.ogg",0);
     }
 
     static switchMap(delx:number, dely:number){
         BattleScene.MapImage.redraw(BattleScene.tmpMapX,BattleScene.tmpMapY);
         console.log(BattleScene.regionmap);
         // 加载地图
+        
         let tmpregion = BattleScene.regionmap[BattleScene.tmpMapY][BattleScene.tmpMapX];
+        if(this.lastRegionType != tmpregion.regiontype){
+            if(tmpregion.regiontype == RegionType.Grass){
+                Laya.SoundManager.playMusic("music/theme-5.ogg",0);
+            }
+            else if(tmpregion.regiontype == RegionType.Desert){
+                Laya.SoundManager.playMusic("music/theme-6.ogg",0);
+            }
+            else if(tmpregion.regiontype == RegionType.Snow){
+                Laya.SoundManager.playMusic("music/theme-7.ogg",0);
+            }else{
+                Laya.SoundManager.playMusic("music/theme-2.ogg",0);
+            }
+        }
+        this.lastRegionType = tmpregion.regiontype;
         let preindex = BattleScene.battleindex;
         let nowindex = BattleScene.battleindex = 1 - BattleScene.battleindex;
         EnemyFactory.clearEnemey();
@@ -138,7 +157,17 @@ export default class BattleScene extends Laya.Scene{
 
         if(tmpregion.node.type == NodeType.g){
             this.princess.visible = true;
-            Laya.timer.once(500,this,()=>{alert("恭喜你！成功救出了公主！点击确定重新开始游戏。");location.reload();})
+            Laya.SoundManager.playMusic("music/theme-18.ogg",0);
+            Laya.timer.once(500,this,
+                ()=>{
+                    Laya.SoundManager.playSound("sound/succes-3.ogg");
+                    alert("恭喜你！成功救出了公主！");
+                    alert("本游戏为字节跳动第二届EMagic Jam作品");
+                    alert("作者：黄高乐 huanggaole@bytedance.com");
+                    alert("感谢您的试玩～");
+                    alert("点击确定重新开始游戏。");
+                    location.reload();
+                })
         }
     }
 }

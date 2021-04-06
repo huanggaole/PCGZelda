@@ -25,6 +25,7 @@ export class PlayerArrow extends Laya.Script{
                 if(character && !character.invincibleStatus){
                     character.hurtFrame = 20;
                     character.HP -= (this.damage + Player.attackdamage);
+                    Laya.SoundManager.playSound("sound/kill.ogg");
                 }
                 let owner = this.owner as Laya.Image;
                 this.removeOwner(owner);

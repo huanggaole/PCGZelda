@@ -78,6 +78,7 @@ export default class GrassEnemy2 extends Character{
             if(character && !character.invincibleStatus){
                 character.hurtFrame = 20;
                 character.HP -= this.damage;
+                Laya.SoundManager.playSound("sound/12.ogg");
             }
         }
     }
